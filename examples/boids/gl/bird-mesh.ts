@@ -12,9 +12,9 @@ export type TBirdUniforms = {
 
 // Custom Mesh - BirdGeometry and some point-cloud adjustments.
 export class BirdMesh extends THREE.Mesh {
-	uniforms: TBirdUniforms;
+	public uniforms: TBirdUniforms;
 	
-	constructor(population: number, group: number) {
+	public constructor(population: number, group: number) {
 		const uniforms = {
 			texturePosition: { value: null } as THREE.Uniform,
 			textureVelocity: { value: null } as THREE.Uniform,

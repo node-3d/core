@@ -1,10 +1,10 @@
-import { type TMouseMoveEvent } from 'glfw-raub';
-import node3d from '../../../index.js';
+import type { TMouseMoveEvent } from '@node-3d/glfw';
+import * as node3d from '@node-3d/core';
 import { countFrame } from '../../utils/perf.ts';
 
 type TCbLoop = (now: number, dt: number, mouse: [number, number]) => void;
 
-export const loopCommon = (isPerf: boolean, cb: TCbLoop) => {
+export const loopCommon = (isPerf: boolean, cb: TCbLoop): (() => void) => {
 	const { doc, loop } = node3d.init();
 	
 	let mouseX = -10000;
@@ -27,8 +27,8 @@ export const loopCommon = (isPerf: boolean, cb: TCbLoop) => {
 		}
 		last = now;
 		
-		let windowHalfX = window.innerWidth / 2;
-		let windowHalfY = window.innerHeight / 2;
+		const windowHalfX = window.innerWidth / 2;
+		const windowHalfY = window.innerHeight / 2;
 		
 		cb(now, delta, [0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY]);
 		

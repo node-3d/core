@@ -4,10 +4,13 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "node --experimental-strip-types main.ts"
+		"start": "node main.ts"
 	},
 	"devDependencies": {
-		"3d-core-raub": "file:../..",
-		"tsconfig-paths": "^4.2.0"
+		"@node-3d/core": "file:../.."
+	},
+	"engines": {
+		"node": ">=24.13.0",
+		"npm": ">=11.6.2"
 	}
 }

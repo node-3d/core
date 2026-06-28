@@ -1,9 +1,15 @@
 {
-  "name": "pixi-example",
+	"name": "pixi-example",
 	"version": "0.0.0",
 	"private": true,
-  "main": "index.js",
-  "dependencies": {
-    "pixi.js": "^7.3.1"
-  }
+	"main": "index.js",
+	"dependencies": {
+		"@node-3d/core": "file:../..",
+		"pixi.js": "^7.3.1"
+	},
+	"type": "module",
+	"engines": {
+		"node": ">=24.13.0",
+		"npm": ">=11.6.2"
+	}
 }

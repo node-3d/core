@@ -1,7 +1,7 @@
 let prevTime = Date.now();
 let frames = 0;
 
-export const countFrame = (now: number) => {
+export const countFrame = (now: number): void => {
 	frames++;
 	if (now >= prevTime + 2000) {
 		console.log(

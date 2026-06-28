@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { BirdGeometryCl } from './bird-geometry-cl.ts';
+import type { TBirdVbos } from './bird-geometry-cl.ts';
 
 const birdVS: string = readFileSync('cl/bird-vs.glsl').toString();
 const birdFS: string = readFileSync('cl/bird-fs.glsl').toString();
@@ -11,10 +12,10 @@ export type TBirdUniforms = {
 
 // Custom Mesh - BirdGeometry and some point-cloud adjustments.
 export class BirdMeshCl extends THREE.Mesh {
-	get vbos() { return (this.geometry as BirdGeometryCl).vbos; }
-	uniforms: TBirdUniforms;
+	public get vbos(): TBirdVbos { return (this.geometry as BirdGeometryCl).vbos; }
+	public uniforms: TBirdUniforms;
 	
-	constructor(population: number) {
+	public constructor(population: number) {
 		const uniforms = {
 			color: new THREE.Uniform(new THREE.Color(0)),
 		} as const;

@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { type WebGLBuffer } from 'webgl-raub';
-import node3d from '../../../index.js';
+import * as node3d from '@node-3d/core';
 
 export type TVboInfo = {
 	vbo: WebGLBuffer,
@@ -14,10 +13,10 @@ export type TBirdVbos = {
 };
 
 const createVbo = (count: number, elements: number): TVboInfo => {
-	const { gl } = node3d.init();
+	const { gl } = node3d;
 	const array = new Float32Array(count * elements);
 	const vbo = gl.createBuffer();
-	const attribute = new THREE.GLBufferAttribute(vbo, gl.FLOAT, elements, 4, count);
+	const attribute = new THREE.GLBufferAttribute(vbo as unknown as globalThis.WebGLBuffer, gl.FLOAT, elements, 4, count);
 	
 	// HACK: instancing support
 	const iattr = attribute as unknown as THREE.InstancedBufferAttribute;
@@ -34,9 +33,9 @@ const createVbo = (count: number, elements: number): TVboInfo => {
 
 // Custom Geometry - 3 triangles and instancing data.
 export class BirdGeometryCl extends THREE.InstancedBufferGeometry {
-	vbos: TBirdVbos;
+	public vbos: TBirdVbos;
 	
-	constructor(population: number) {
+	public constructor(population: number) {
 		super();
 		
 		this.instanceCount = population;

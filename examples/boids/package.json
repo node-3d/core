@@ -4,10 +4,17 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"boids-gl": "node --no-warnings=ExperimentalWarning --experimental-strip-types boids-gl.ts",
-		"boids-cl": "node --no-warnings=ExperimentalWarning --experimental-strip-types boids-cl.ts"
+		"gl": "node boids-gl.ts",
+		"cl": "node boids-cl.ts",
+		"cuda": "node boids-cuda.ts"
 	},
 	"dependencies": {
-		"opencl-raub": "^2.0.1"
+		"@node-3d/core": "file:../..",
+		"@node-3d/cuda": "file:../../../@node-3d/cuda",
+		"@node-3d/opencl": "^2.0.1"
+	},
+	"engines": {
+		"node": ">=24.13.0",
+		"npm": ">=11.6.2"
 	}
 }

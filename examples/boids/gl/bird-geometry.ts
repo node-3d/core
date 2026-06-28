@@ -1,10 +1,11 @@
+// oxlint-disable unicorn/prefer-math-trunc
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_gpgpu_birds.html
 
 import * as THREE from 'three';
 
 // Custom Geometry - using 3 triangles each. No UVs, no normals currently.
 export class BirdGeometry extends THREE.BufferGeometry {
-	constructor(population: number, group: number) {
+	public constructor(population: number, group: number) {
 		super();
 		
 		const trianglesPerBird = 3;
@@ -25,8 +26,8 @@ export class BirdGeometry extends THREE.BufferGeometry {
 		
 		let v = 0;
 		const verts_push = (...args: number[]) => {
-			for (let i = 0; i < args.length; i++) {
-				vertices.array[v++] = args[i];
+			for (const arg of args) {
+				vertices.array[v++] = arg;
 			}
 		};
 		

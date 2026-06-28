@@ -1,0 +1,35 @@
+name: Lint
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    strategy:
+        matrix:
+          os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      - name: Fetch Repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.13.0
+          cache: 'npm'
+
+      - name: Install Modules
+        run: npm ci
+
+      - name: Run Lint
+        run: npm run lint

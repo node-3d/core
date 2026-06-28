@@ -2,9 +2,8 @@
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import {
-	GPUComputationRenderer, type Variable,
-} from 'three/addons/misc/GPUComputationRenderer.js';
+import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
+import type { Variable } from 'three/addons/misc/GPUComputationRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { initCommon } from './utils/init-common.ts';
 import { fillPositionAndPhase, fillVelocity } from './utils/fill-data.ts';

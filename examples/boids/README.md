@@ -7,11 +7,13 @@ the Boids simulation only specifies the behavior of each individual bird.
 
 ```console
 npm ci
-npm run boids-gl
-npm run boids-cl
+npm run gl
+npm run cl
+npm run cuda
 ```
 
-This example uses the package "opencl-raub", so a separate `npm ci` needs to be run here.
+This example uses the packages "@node-3d/opencl" and "@node-3d/cuda", so a separate `npm ci`
+needs to be run here.
 
 ![Example](screenshot.png)
 
@@ -22,6 +24,7 @@ This example uses the package "opencl-raub", so a separate `npm ci` needs to be 
 [presentation](http://web.engr.oregonstate.edu/~mjb/cs575/Handouts/opencl.opengl.vbo.1pp.pdf).
 * Some optimization ideas for the OpenCL demo were taken from this
 [guide](https://developer.download.nvidia.com/compute/DevZone/docs/html/OpenCL/doc/OpenCL_Best_Practices_Guide.pdf)
+* The CUDA implementation updates the GL VBOs through CUDA/OpenGL interop.
 
 The OpenCL implementation is similar to GLSL one algorithmically - i.e. the same N to N
 interaction is performed. This is a basic example, not a grid-based N-body. It only
@@ -49,9 +52,8 @@ But a more straightforward way of using shared VBOs was chosen. To implement tha
 birds mesh was adjusted for instancing. The changes are mostly related to how the
 birds geometry is configured (see [GL](gl/bird-geometry.ts) vs [CL](cl/bird-geometry-cl.ts)).
 
-The call to `cl.enqueueAcquireGLObjects` is only performed once. That works for a combination
-of **Windows + nVidia**. It may turn out that on other platforms this should be called
-every frame.
+The GL VBOs are acquired before OpenCL writes them and released before OpenGL renders them
+again. This follows the Khronos OpenCL/OpenGL sharing ownership rules.
 
 The naive implementation of N-body interaction performs similar in performance to GLSL -
 because they do basically the same. I.e. the same number of GPU memory reads and writes,
@@ -67,3 +69,14 @@ copy 256 entries into local memory (1 entry per thread).
 but only reading from shared (and not **global**) memory.
 1. Hence we use (the order of) N **global** reads, instead of N\*N. If N is **16384**, N\*N is **268,435,456**.
 Although, we still do that amount of calculations either way.
+
+## CUDA notes
+
+The CUDA implementation uses the same instanced VBO layout as the OpenCL version, but it
+registers the position and velocity VBOs with CUDA. The render loop maps them before CUDA
+writes, launches the CUDA kernel directly against the mapped device pointers, unmaps them,
+and then renders the updated buffers with OpenGL. This follows the NVIDIA CUDA graphics
+interop ownership rules.
+
+See [boids.cu](cuda/boids.cu). It mirrors the OpenCL kernel, using 256-thread blocks and
+CUDA shared memory for each chunk of boids.

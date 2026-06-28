@@ -3,9 +3,8 @@ import {
     DataTexture, LinearSRGBColorSpace, NoToneMapping, SRGBColorSpace, Uniform, WebGLRenderer,
 } from 'three';
 
-import Img from 'image-raub';
-import { init } from '3d-core-raub';
-import { SimpleTextureProcessor } from './simple_texture_processor.ts';
+import { Image, init } from '@node-3d/core';
+import { SimpleTextureProcessor } from './simple-texture-processor.ts';
 
 init({
     isGles3: true,
@@ -37,7 +36,7 @@ const shader = `
 `;
 
 /** Create a datatexture of size 512x512 filled with constant value */
-function createDataTexture() {
+const createDataTexture = () => {
     const texture = new DataTexture();
     texture.image = {
         data: new Uint8ClampedArray(512 * 512 * 4).fill(100, 0, 512 * 512 * 2).fill(200, 512 * 512 * 2),
@@ -47,13 +46,13 @@ function createDataTexture() {
     return texture;
 }
 
-function processAndSave(savePath: string, texture: DataTexture) {
+const processAndSave = (savePath: string, texture: DataTexture) => {
     const res = processor.process(shader, {
         tex: new Uniform(texture),
     });
     console.log(res.slice(0, 4));
     
-    const img = Img.fromPixels(512, 512, 32, Buffer.from(res));
+    const img = Image.fromPixels(512, 512, 32, Buffer.from(res));
     img.save(savePath);
 }
 

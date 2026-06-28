@@ -1,4 +1,4 @@
-export const randBound = (extents: number = 1) => {
+export const randBound = (extents: number = 1): [number, number, number] => {
 	const half = extents * 0.5;
 	return [
 		Math.random() * extents - half,
@@ -7,7 +7,7 @@ export const randBound = (extents: number = 1) => {
 	];
 };
 
-export const fillPositionAndPhase = (data: ArrayBufferView, extents: number) => {
+export const fillPositionAndPhase = (data: ArrayBufferView, extents: number): void => {
 	const asF32 = new Float32Array(data.buffer);
 	const len = asF32.length;
 	
@@ -20,7 +20,7 @@ export const fillPositionAndPhase = (data: ArrayBufferView, extents: number) => 
 	}
 };
 
-export const fillVelocity = (data: ArrayBufferView) => {
+export const fillVelocity = (data: ArrayBufferView): void => {
 	const asF32 = new Float32Array(data.buffer);
 	const len = asF32.length;
 	

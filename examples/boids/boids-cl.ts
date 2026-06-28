@@ -4,7 +4,7 @@
 
 import { readFileSync } from 'node:fs';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import cl from 'opencl-raub';
+import * as cl from '@node-3d/opencl';
 import { initCommon } from './utils/init-common.ts';
 import { loopCommon } from './utils/loop-common.ts';
 import { BirdMeshCl } from './cl/bird-mesh-cl.ts';
@@ -43,12 +43,8 @@ fillVelocity(velocity.array);
 gl.bindBuffer(gl.ARRAY_BUFFER, velocity.vbo);
 gl.bufferData(gl.ARRAY_BUFFER, velocity.array, gl.STATIC_DRAW);
 
-const memPos = cl.createFromGLBuffer(context, cl.MEM_READ_WRITE, offsets.vbo._);
-const memVel = cl.createFromGLBuffer(context, cl.MEM_READ_WRITE, velocity.vbo._);
-
-cl.enqueueAcquireGLObjects(queue, memPos);
-cl.enqueueAcquireGLObjects(queue, memVel);
-cl.finish(queue);
+const memPos = cl.createFromGLBuffer(context, cl.MEM_READ_WRITE, gl.extractId(offsets.vbo));
+const memVel = cl.createFromGLBuffer(context, cl.MEM_READ_WRITE, gl.extractId(velocity.vbo));
 
 // Create a program object
 const program = cl.createProgramWithSource(context, boidsSrc);
@@ -59,6 +55,9 @@ const kernelUpdate = cl.createKernel(program, 'update');
 const separation = 20.0;
 const alignment = 20.0;
 const cohesion = 20.0;
+const maxFramesArg = process.argv.find(arg => arg.startsWith('--max-frames='));
+const maxFrames = maxFramesArg ? Number.parseInt(maxFramesArg.slice('--max-frames='.length), 10) : 0;
+let frameCount = 0;
 
 cl.setKernelArg(kernelUpdate, 0, 'uint', BIRDS);
 cl.setKernelArg(kernelUpdate, 1, 'float', 0.016); // dynamic
@@ -81,9 +80,22 @@ loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	
 	gl.finish();
 	
+	// Khronos requires acquiring GL objects before OpenCL use and releasing them before GL reuse.
+	// https://registry.khronos.org/OpenCL/specs/unified/refpages/man/html/clEnqueueAcquireGLObjects.html
+	// https://registry.khronos.org/OpenCL/specs/unified/refpages/man/html/clEnqueueReleaseGLObjects.html
+	cl.enqueueAcquireGLObjects(queue, memPos);
+	cl.enqueueAcquireGLObjects(queue, memVel);
+	
 	cl.enqueueNDRangeKernel(queue, kernelUpdate, 1, null, [BIRDS], [256]);
 	
+	cl.enqueueReleaseGLObjects(queue, memPos);
+	cl.enqueueReleaseGLObjects(queue, memVel);
 	cl.finish(queue);
 	
 	screen.draw();
+
+	frameCount++;
+	if (maxFrames > 0 && frameCount >= maxFrames) {
+		process.exit(0);
+	}
 });
