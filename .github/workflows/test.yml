@@ -34,7 +34,7 @@ jobs:
 
       - name: Tests - Linux
         if: matrix.os == 'ubuntu-22.04' || matrix.os == 'ubuntu-22.04-arm'
-        run: xvfb-run --auto-servernum npm run test-ci
+        run: xvfb-run --auto-servernum npm run test:ci
 
       - uses: ssciwr/setup-mesa-dist-win@v2
         if: matrix.os == 'windows-2022'
@@ -42,11 +42,11 @@ jobs:
       - name: Test - Windows
         shell: bash
         if: matrix.os == 'windows-2022'
-        run: npm run test-ci
+        run: npm run test:ci
 
       # - name: Test - MacOS
       #   if: matrix.os == 'macos-14'
-      #   run: npm run test-ci
+      #   run: npm run test:ci
 
       - uses: actions/upload-artifact@v4
         if: matrix.os != 'macos-14'
