@@ -16,7 +16,7 @@
 				"./ts/index.ts"
 			],
 			"@node-3d/glfw": [
-				"../glfw-raub"
+				"../glfw"
 			]
 		},
 		"verbatimModuleSyntax": true,
