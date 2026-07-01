@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import type * as THREE from 'three';
 import { download, getLogger } from '@node-3d/addon-tools';
 
-const logger = getLogger('3d-core');
+const logger = getLogger('core');
 
 type TFileLoadValue = string | ArrayBuffer | Blob | Record<string, never> | unknown;
 type TFileLoadCallback = (value: TFileLoadValue) => void;

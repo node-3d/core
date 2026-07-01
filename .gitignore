@@ -5,7 +5,7 @@
 .project
 .vscode
 node_modules/
-examples/3d-core/*.jpg
-examples/3d-core/*.png
+examples/core/*.jpg
+examples/core/*.png
 *.log
 test/__diff__

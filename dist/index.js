@@ -94,7 +94,7 @@ class WebVRManager {
     }
     submitFrame() {}
 }
-const logger = getLogger('3d-core');
+const logger = getLogger('core');
 const finishLoad = (responseType, mimeType, onLoad, buffer)=>{
     if (!onLoad) return;
     if ('arraybuffer' === responseType) return void onLoad(new Uint8Array(buffer).buffer);
