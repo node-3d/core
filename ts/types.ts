@@ -107,39 +107,53 @@ export type TNavigator = Readonly<{
 
 export type TWebVRManagerConstructor = typeof WebVRManager;
 
-export type TVec2Source = Vec2 | readonly [number, number] | Readonly<{
-	0: number;
-	1: number;
-	x?: number;
-	y?: number;
-}>;
+export type TVec2Source =
+	| Vec2
+	| readonly [number, number]
+	| Readonly<{
+			0: number;
+			1: number;
+			x?: number;
+			y?: number;
+	  }>;
 
-export type TVec3Source = Vec3 | readonly [number, number, number] | Readonly<{
-	0: number;
-	1: number;
-	2: number;
-	x?: number;
-	y?: number;
-	z?: number;
-}>;
+export type TVec3Source =
+	| Vec3
+	| readonly [number, number, number]
+	| Readonly<{
+			0: number;
+			1: number;
+			2: number;
+			x?: number;
+			y?: number;
+			z?: number;
+	  }>;
 
-export type TVec4Source = Vec4 | readonly [number, number, number, number] | Readonly<{
-	0: number;
-	1: number;
-	2: number;
-	3: number;
-	x?: number;
-	y?: number;
-	z?: number;
-	w?: number;
-}>;
+export type TVec4Source =
+	| Vec4
+	| readonly [number, number, number, number]
+	| Readonly<{
+			0: number;
+			1: number;
+			2: number;
+			3: number;
+			x?: number;
+			y?: number;
+			z?: number;
+			w?: number;
+	  }>;
 
-export type TColorSource = TVec3Source | TVec4Source | string | number | Readonly<{
-	r: number;
-	g: number;
-	b: number;
-	a?: number;
-}>;
+export type TColorSource =
+	| TVec3Source
+	| TVec4Source
+	| string
+	| number
+	| Readonly<{
+			r: number;
+			g: number;
+			b: number;
+			a?: number;
+	  }>;
 
 export type TCore3D = {
 	doc: TDocument;
@@ -147,11 +161,12 @@ export type TCore3D = {
 	raf: TDocument['requestAnimationFrame'];
 };
 
-export type TInitOpts = TDocumentOpts & Readonly<{
-	isGles3?: boolean;
-	isWebGL2?: boolean;
-	isVisible?: boolean;
-}>;
+export type TInitOpts = TDocumentOpts &
+	Readonly<{
+		isGles3?: boolean;
+		isWebGL2?: boolean;
+		isVisible?: boolean;
+	}>;
 
 export type TNode3DGlobal = {
 	globalThis?: TNode3DGlobal;

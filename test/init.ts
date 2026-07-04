@@ -1,14 +1,16 @@
 import { platform } from 'node:process';
-import { init, addThreeHelpers, Image, glfw } from '../ts/index.ts';
+import { init, addThreeHelpers, glfw } from '../ts/index.ts';
 import * as three from 'three';
 
 const initOptsLinux = {
-	width: 400, height: 400,
+	width: 400,
+	height: 400,
 	isGles3: true,
 	isWebGL2: true,
 };
 const initOpts = {
-	width: 400, height: 400,
+	width: 400,
+	height: 400,
 	isGles3: false,
 	major: 2,
 	minor: 1,
@@ -27,5 +29,8 @@ const { doc } = inited;
 const window = doc;
 const document = doc;
 
-export { doc, Image, window, document };
+export { Image } from '../ts/index.ts';
+
+export { doc, window, document };
+
 export default inited;

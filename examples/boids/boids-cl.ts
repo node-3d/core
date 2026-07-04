@@ -20,9 +20,12 @@ const { platform, device } = cl.quickStart(!true);
 
 const context = cl.createContext(
 	[
-		cl.GL_CONTEXT_KHR, doc.platformContext,
-		cl.WGL_HDC_KHR, doc.platformDevice,
-		cl.CONTEXT_PLATFORM, platform,
+		cl.GL_CONTEXT_KHR,
+		doc.platformContext,
+		cl.WGL_HDC_KHR,
+		doc.platformDevice,
+		cl.CONTEXT_PLATFORM,
+		platform,
 	],
 	[device],
 );
@@ -55,8 +58,10 @@ const kernelUpdate = cl.createKernel(program, 'update');
 const separation = 20.0;
 const alignment = 20.0;
 const cohesion = 20.0;
-const maxFramesArg = process.argv.find(arg => arg.startsWith('--max-frames='));
-const maxFrames = maxFramesArg ? Number.parseInt(maxFramesArg.slice('--max-frames='.length), 10) : 0;
+const maxFramesArg = process.argv.find((arg) => arg.startsWith('--max-frames='));
+const maxFrames = maxFramesArg
+	? Number.parseInt(maxFramesArg.slice('--max-frames='.length), 10)
+	: 0;
 let frameCount = 0;
 
 cl.setKernelArg(kernelUpdate, 0, 'uint', BIRDS);
@@ -70,28 +75,27 @@ cl.setKernelArg(kernelUpdate, 7, 'float', cohesion);
 cl.setKernelArg(kernelUpdate, 8, 'float*', memPos);
 cl.setKernelArg(kernelUpdate, 9, 'float*', memVel);
 
-
 loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	controls.update();
-	
+
 	cl.setKernelArg(kernelUpdate, 1, 'float', delta);
 	cl.setKernelArg(kernelUpdate, 3, 'float', mouse[0] * BOUNDS);
 	cl.setKernelArg(kernelUpdate, 4, 'float', mouse[1] * BOUNDS);
-	
+
 	gl.finish();
-	
+
 	// Khronos requires acquiring GL objects before OpenCL use and releasing them before GL reuse.
 	// https://registry.khronos.org/OpenCL/specs/unified/refpages/man/html/clEnqueueAcquireGLObjects.html
 	// https://registry.khronos.org/OpenCL/specs/unified/refpages/man/html/clEnqueueReleaseGLObjects.html
 	cl.enqueueAcquireGLObjects(queue, memPos);
 	cl.enqueueAcquireGLObjects(queue, memVel);
-	
+
 	cl.enqueueNDRangeKernel(queue, kernelUpdate, 1, null, [BIRDS], [256]);
-	
+
 	cl.enqueueReleaseGLObjects(queue, memPos);
 	cl.enqueueReleaseGLObjects(queue, memVel);
 	cl.finish(queue);
-	
+
 	screen.draw();
 
 	frameCount++;

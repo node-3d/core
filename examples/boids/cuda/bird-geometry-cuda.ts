@@ -2,14 +2,14 @@ import * as THREE from 'three';
 import * as node3d from '@node-3d/core';
 
 export type TVboInfo = {
-	vbo: WebGLBuffer,
-	array: Float32Array,
-	attribute: THREE.BufferAttribute,
+	vbo: WebGLBuffer;
+	array: Float32Array;
+	attribute: THREE.BufferAttribute;
 };
 
 export type TBirdVbos = {
-	velocity: TVboInfo,
-	offsets: TVboInfo,
+	velocity: TVboInfo;
+	offsets: TVboInfo;
 };
 
 const createVbo = (count: number, elements: number): TVboInfo => {
@@ -47,18 +47,36 @@ export class BirdGeometryCuda extends THREE.InstancedBufferGeometry {
 		const wingsSpan = 20;
 		const vertData = [
 			// Body
-			0, -0, -wingsSpan,
-			0, 4, -wingsSpan,
-			0, 0, 30,
+			0,
+			-0,
+			-wingsSpan,
+			0,
+			4,
+			-wingsSpan,
+			0,
+			0,
+			30,
 
 			// Wings
-			0, 0, -15,
-			-wingsSpan, 0, 0,
-			0, 0, 15,
-			0, 0, 15,
-			wingsSpan, 0, 0,
-			0, 0, -15,
-		].map(x => (x * 0.2));
+			0,
+			0,
+			-15,
+			-wingsSpan,
+			0,
+			0,
+			0,
+			0,
+			15,
+			0,
+			0,
+			15,
+			wingsSpan,
+			0,
+			0,
+			0,
+			0,
+			-15,
+		].map((x) => x * 0.2);
 		const idxData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 		const vertices = new THREE.BufferAttribute(new Float32Array(vertData), 3);
@@ -74,9 +92,9 @@ export class BirdGeometryCuda extends THREE.InstancedBufferGeometry {
 		this.setAttribute('velocity', velocity.attribute);
 		this.setAttribute('offset', offsets.attribute);
 
-		this.computeBoundingSphere = (() => {
+		this.computeBoundingSphere = () => {
 			this.boundingSphere = new THREE.Sphere(undefined, Infinity);
-		});
+		};
 		this.computeBoundingSphere();
 	}
 }

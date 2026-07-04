@@ -2,7 +2,6 @@ import * as three from 'three';
 
 import { Brush, Screen, init } from '@node-3d/core';
 
-
 const { loop } = init({
 	isGles3: true,
 	isWebGL2: true,
@@ -15,6 +14,8 @@ const { loop } = init({
 const screen = new Screen({ three });
 loop(() => screen.draw());
 
-const brush = new Brush({ screen, color: 0x00FF00 });
+const brush = new Brush({ screen, color: 0x00ff00 });
 
-screen.on('mousemove', (e) => { brush.pos = [e.x, e.y]; });
+screen.on('mousemove', (e) => {
+	brush.pos = [e.x, e.y];
+});

@@ -1,6 +1,7 @@
 // Init Node3D environment
 import * as THREE from 'three';
 import { Screen, addThreeHelpers, init } from '@node-3d/core';
+
 const { doc, loop } = init({
 	isGles3: true,
 	// isGles3: false, // - works too

@@ -18,20 +18,24 @@ type TPaletteSettings = Readonly<{
 const oklabToLinearSrgb = (L: number, a: number, b: number): TRgb => {
 	const l0 = L + 0.3963377774 * a + 0.2158037573 * b;
 	const m0 = L - 0.1055613458 * a - 0.0638541728 * b;
-	const s0 = L - 0.0894841775 * a - 1.2914855480 * b;
+	const s0 = L - 0.0894841775 * a - 1.291485548 * b;
 
 	const l = l0 * l0 * l0;
 	const m = m0 * m0 * m0;
 	const s = s0 * s0 * s0;
 
 	return [
-		(+4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
-		(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
-		(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s),
+		+4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+		-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+		-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
 	];
 };
 
-const oklchToOklab = (L: number, c: number, h: number): TRgb => [L, c * Math.cos(h), c * Math.sin(h)];
+const oklchToOklab = (L: number, c: number, h: number): TRgb => [
+	L,
+	c * Math.cos(h),
+	c * Math.sin(h),
+];
 
 const lerp = (min: number, max: number, t: number): number => min + (max - min) * t;
 
@@ -58,9 +62,9 @@ const generateOKLCH = (hueMode: THueMode, settings: TPaletteSettings): TRgb[] =>
 	}
 
 	for (let i = 0; i < settings.colorCount; ++i) {
-		const linearIterator = (i) / (settings.colorCount - 1);
+		const linearIterator = i / (settings.colorCount - 1);
 
-		let hueOffset = linearIterator * hueContrast * 2 * Math.PI + (Math.PI / 4);
+		let hueOffset = linearIterator * hueContrast * 2 * Math.PI + Math.PI / 4;
 
 		if (hueMode === 'monochromatic') {
 			hueOffset *= 0.0;
@@ -98,7 +102,7 @@ const generateOKLCH = (hueMode: THueMode, settings: TPaletteSettings): TRgb[] =>
 		rgb[0] = Math.max(0.0, Math.min(rgb[0], 1.0));
 		rgb[1] = Math.max(0.0, Math.min(rgb[1], 1.0));
 		rgb[2] = Math.max(0.0, Math.min(rgb[2], 1.0));
-		
+
 		oklchColors.push(rgb);
 	}
 
@@ -138,5 +142,4 @@ export { hueModes, generatePalette };
 export default {
 	hueModes,
 	generatePalette,
-
 };

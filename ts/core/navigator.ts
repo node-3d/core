@@ -7,7 +7,11 @@ export const navigator: TNavigator = {
 	bluetooth: {},
 	clipboard: {},
 	connection: {
-		onchange: null, effectiveType: '4g', rtt: 50, downlink: 3.3, saveData: false
+		onchange: null,
+		effectiveType: '4g',
+		rtt: 50,
+		downlink: 3.3,
+		saveData: false,
 	},
 	cookieEnabled: false,
 	credentials: {},
@@ -34,7 +38,7 @@ export const navigator: TNavigator = {
 		ready: Promise.resolve(false),
 		controller: null,
 		oncontrollerchange: null,
-		onmessage: null
+		onmessage: null,
 	},
 	storage: {},
 	usb: { onconnect: null, ondisconnect: null },

@@ -7,7 +7,7 @@ const createColorQuads = (
 	isSwap: boolean,
 ): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>[] => {
 	const colorQuads: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>[] = [];
-	
+
 	for (let i = 0; i < palette.length; i++) {
 		const color = palette[i];
 		const materialColor = new three.ShaderMaterial({
@@ -32,14 +32,15 @@ const createColorQuads = (
 			`,
 		});
 		const quadColor = new three.Mesh(
-			new three.PlaneGeometry(0.1, 2 / palette.length), materialColor,
+			new three.PlaneGeometry(0.1, 2 / palette.length),
+			materialColor,
 		);
-		quadColor.geometry.translate(-0.95, -1 + 2 * (i + 0.5) / palette.length, 1);
+		quadColor.geometry.translate(-0.95, -1 + (2 * (i + 0.5)) / palette.length, 1);
 		quadColor.visible = isSwap;
 		scenePost.add(quadColor);
 		colorQuads.push(quadColor);
 	}
-	
+
 	return colorQuads;
 };
 

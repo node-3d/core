@@ -2,7 +2,6 @@ import * as three from 'three';
 
 import { Screen, Tris, gl, init } from '@node-3d/core';
 
-
 const { loop } = init({
 	isGles3: true,
 	isWebGL2: true,
@@ -18,7 +17,6 @@ loop(() => screen.draw());
 screen.camera.position.z = 70;
 
 const VBO_SIZE = 3000;
-
 
 const vertices = [];
 const colors = [];
@@ -50,24 +48,27 @@ const tris = new Tris({
 	},
 });
 
-
 let isMoving = false;
 const mouse = { x: 0, y: 0 };
 
-screen.on('mousedown', () => { isMoving = true; });
-screen.on('mouseup', () => { isMoving = false; });
+screen.on('mousedown', () => {
+	isMoving = true;
+});
+screen.on('mouseup', () => {
+	isMoving = false;
+});
 
 screen.on('mousemove', (e) => {
 	const dx = mouse.x - e.x;
 	const dy = mouse.y - e.y;
-	
+
 	mouse.x = e.x;
 	mouse.y = e.y;
-	
+
 	if (!isMoving) {
 		return;
 	}
-	
+
 	tris.mesh.rotation.y += dx * 0.001;
 	tris.mesh.rotation.x += dy * 0.001;
 });

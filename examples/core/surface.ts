@@ -2,7 +2,6 @@ import * as three from 'three';
 
 import { Points, Rect, Screen, Surface, gl, init } from '@node-3d/core';
 
-
 const { loop } = init({
 	isGles3: true,
 	isWebGL2: true,
@@ -32,8 +31,8 @@ const rect2 = new Rect({ screen: surfaceScreen, pos: [-500, -500], size: [1000, 
 const vertices = [];
 const colors = [];
 for (let i = VBO_SIZE * 3; i > 0; i--) {
-	vertices.push( Math.random() * 600 - 300 );
-	colors.push( Math.random() );
+	vertices.push(Math.random() * 600 - 300);
+	colors.push(Math.random());
 }
 
 const pos = gl.createBuffer();
@@ -59,26 +58,29 @@ const points = new Points({
 	},
 });
 
-
 let isRotating = false;
 const mouse = { x: 0, y: 0 };
 
-screen.on('mousedown', () => { isRotating = true; });
-screen.on('mouseup', () => { isRotating = false; });
+screen.on('mousedown', () => {
+	isRotating = true;
+});
+screen.on('mouseup', () => {
+	isRotating = false;
+});
 
 screen.on('mousemove', (e) => {
 	const dx = mouse.x - e.x;
 	const dy = mouse.y - e.y;
-	
+
 	mouse.x = e.x;
 	mouse.y = e.y;
-	
+
 	if (!isRotating) {
 		return;
 	}
-	
+
 	points.mesh.rotation.y += dx * 0.001;
 	points.mesh.rotation.x += dy * 0.001;
-	
+
 	surface.pos = surface.pos.plused([-dx, dy]);
 });

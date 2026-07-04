@@ -14,8 +14,8 @@ type TFileLoaderThis = THREE.FileLoader & {
 	path?: string;
 };
 type TTextureProperties = {
-	'__webglTexture'?: unknown;
-	'__webglInit'?: boolean;
+	__webglTexture?: unknown;
+	__webglInit?: boolean;
 };
 type TTextureConstructorWithFromId = typeof THREE.Texture & {
 	fromId?: (id: number, renderer: THREE.WebGLRenderer) => THREE.Texture;
@@ -30,22 +30,22 @@ const finishLoad = (
 	if (!onLoad) {
 		return;
 	}
-	
+
 	if (responseType === 'arraybuffer') {
-		onLoad((new Uint8Array(buffer)).buffer);
+		onLoad(new Uint8Array(buffer).buffer);
 		return;
 	}
-	
+
 	if (responseType === 'blob') {
 		onLoad(new Blob([buffer]));
 		return;
 	}
-	
+
 	if (responseType === 'document') {
 		onLoad({});
 		return;
 	}
-	
+
 	if (responseType === 'json') {
 		try {
 			onLoad(JSON.parse(buffer.toString()) as unknown);
@@ -54,17 +54,17 @@ const finishLoad = (
 		}
 		return;
 	}
-	
+
 	if (!mimeType) {
 		onLoad(buffer.toString());
 		return;
 	}
-	
+
 	const re = /charset="?([^;"\s]*)"?/iu;
 	const exec = re.exec(mimeType);
 	const label = exec && exec[1] ? exec[1].toLowerCase() : undefined;
 	const decoder = new TextDecoder(label);
-	
+
 	onLoad(decoder.decode(buffer));
 };
 
@@ -74,7 +74,8 @@ export type ThreeHelpersTargets = {
 };
 
 export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
-	const fileLoaderPrototype = (three.FileLoader as typeof THREE.FileLoader).prototype as unknown as {
+	const fileLoaderPrototype = (three.FileLoader as typeof THREE.FileLoader)
+		.prototype as unknown as {
 		load: (
 			url: string,
 			onLoad?: TFileLoadCallback,
@@ -82,7 +83,7 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 			onError?: TFileErrorCallback,
 		) => THREE.FileLoader;
 	};
-	
+
 	fileLoaderPrototype.load = function load(
 		this: TFileLoaderThis,
 		url: string,
@@ -97,7 +98,7 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 			finishLoad(this.responseType, this.mimeType, onLoad, data);
 			return this;
 		}
-		
+
 		if (/^https?:\/\//iu.test(url)) {
 			(async () => {
 				try {
@@ -111,10 +112,10 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 					}
 				}
 			})();
-			
+
 			return this;
 		}
-		
+
 		const fsUrl = this.path === undefined ? url : this.path + url;
 		fs.readFile(fsUrl, (error, data) => {
 			if (error) {
@@ -127,19 +128,19 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 			}
 			finishLoad(this.responseType, this.mimeType, onLoad, data);
 		});
-		
+
 		return this;
 	};
-	
+
 	const Texture = three.Texture as TTextureConstructorWithFromId;
 	Texture.fromId = (id, renderer) => {
 		const rawTexture = { _: id } as WebGLTexture;
-		
+
 		const texture = new (three.Texture as typeof THREE.Texture)();
 		const properties = (renderer.properties?.get(texture) ?? texture) as TTextureProperties;
 		properties['__webglTexture'] = rawTexture;
 		properties['__webglInit'] = true;
-		
+
 		return texture;
 	};
 };

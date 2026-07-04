@@ -39,10 +39,14 @@ export class Cloud extends Drawable {
 	public constructor(opts: TCloudOpts) {
 		super(opts);
 	}
-	
-	public override get color(): null { return null; }
-	public override set color(_value: Color | null) { /* do nothing */ }
-	
+
+	public override get color(): null {
+		return null;
+	}
+	public override set color(_value: Color | null) {
+		/* do nothing */
+	}
+
 	public buildAttr(source: TCloudAttribute, count: number): THREE.GLBufferAttribute {
 		return new this.screen.three.GLBufferAttribute(
 			source.vbo as unknown as WebGLBuffer,
@@ -52,29 +56,37 @@ export class Cloud extends Drawable {
 			count,
 		);
 	}
-	
+
 	public override _geo(opts: TCloudOpts): THREE.BufferGeometry {
 		const geo = new this.screen.three.BufferGeometry();
-		
+
 		for (const key of Object.keys(opts.attrs)) {
 			const attr = opts.attrs[key];
 			if (attr && typeof attr === 'object') {
-				geo.setAttribute(key, this.buildAttr(attr, opts.count) as unknown as THREE.BufferAttribute);
+				geo.setAttribute(
+					key,
+					this.buildAttr(attr, opts.count) as unknown as THREE.BufferAttribute,
+				);
 			}
 		}
-		geo.boundingSphere = new this.screen.three.Sphere(new this.screen.three.Vector3(), Infinity);
-		
+		geo.boundingSphere = new this.screen.three.Sphere(
+			new this.screen.three.Vector3(),
+			Infinity,
+		);
+
 		return geo;
 	}
-	
+
 	public override _mat(opts: TCloudOpts): TMaterialWithCoreProps {
 		const uniforms = {
 			...opts.uniforms,
 			winh: { value: this.screen.height },
 		};
-		
-		this.screen.on('resize', ({ height }: { height: number }) => { uniforms.winh.value = height; });
-		
+
+		this.screen.on('resize', ({ height }: { height: number }) => {
+			uniforms.winh.value = height;
+		});
+
 		return new this.screen.three.ShaderMaterial({
 			blending: this.screen.three.NormalBlending,
 			depthTest: opts.depthTest === true,
@@ -84,9 +96,11 @@ export class Cloud extends Drawable {
 			fragmentShader: this.buildFrag(opts),
 		});
 	}
-	
+
 	public buildVert(opts: TCloudOpts): string {
-		return opts.vert || `
+		return (
+			opts.vert ||
+			`
 			attribute vec3  color;
 			varying   vec3  varColor;
 			
@@ -103,11 +117,14 @@ export class Cloud extends Drawable {
 				${opts.inject?.vert?.after ?? ''}
 				
 			}
-		`;
+		`
+		);
 	}
-	
+
 	public buildFrag(opts: TCloudOpts): string {
-		return opts.frag || `
+		return (
+			opts.frag ||
+			`
 			varying vec3  varColor;
 			
 			${opts.inject?.frag?.vars ?? ''}
@@ -122,16 +139,15 @@ export class Cloud extends Drawable {
 				${opts.inject?.frag?.after ?? ''}
 				
 			}
-		`;
+		`
+		);
 	}
-	
+
 	public override _build(opts: TCloudOpts): TDrawableMesh {
 		const points = new this.screen.three.Points(this._geo(opts), this._mat(opts));
 		points.frustumCulled = false;
-		(points as THREE.Points & { boundingSphere?: THREE.Sphere }).boundingSphere = new this.screen.three.Sphere(
-			new this.screen.three.Vector3(),
-			Infinity,
-		);
+		(points as THREE.Points & { boundingSphere?: THREE.Sphere }).boundingSphere =
+			new this.screen.three.Sphere(new this.screen.three.Vector3(), Infinity);
 		return points as unknown as TDrawableMesh;
 	}
 }

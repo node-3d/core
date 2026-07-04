@@ -24,15 +24,11 @@ import {
 	VignetteShader,
 } from './post-shaders.ts';
 
-
 const IS_PERF_MODE = true;
 
 const cwd = import.meta.dirname;
 
-
-const {
-	doc, loop,
-} = init({
+const { doc, loop } = init({
 	isGles3: true,
 	// isWebGL2: true,
 	autoEsc: true,
@@ -81,8 +77,14 @@ let renderScene: TexturePass | null = null;
 
 const delta = 0.01;
 
-
-const cameraOrtho = new THREE.OrthographicCamera(- halfWidth, halfWidth, halfHeight, - halfHeight, - 10000, 10000);
+const cameraOrtho = new THREE.OrthographicCamera(
+	-halfWidth,
+	halfWidth,
+	halfHeight,
+	-halfHeight,
+	-10000,
+	10000,
+);
 cameraOrtho.position.z = 100;
 
 const cameraPerspective = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
@@ -96,7 +98,7 @@ const sceneBG = new THREE.Scene();
 //
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-directionalLight.position.set(0, - 0.1, 1).normalize();
+directionalLight.position.set(0, -0.1, 1).normalize();
 sceneModel.add(directionalLight);
 
 const diffuseMap = new THREE.TextureLoader().load('textures/pz.jpg');
@@ -104,11 +106,11 @@ const diffuseMap = new THREE.TextureLoader().load('textures/pz.jpg');
 
 const materialColor = new THREE.MeshBasicMaterial({
 	map: diffuseMap,
-	depthTest: false
+	depthTest: false,
 });
 
 const quadBG = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), materialColor);
-quadBG.position.z = - 500;
+quadBG.position.z = -500;
 quadBG.scale.set(width, height, 1);
 sceneBG.add(quadBG);
 
@@ -116,8 +118,11 @@ sceneBG.add(quadBG);
 
 const sceneMask = new THREE.Scene();
 
-const quadMask = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
-quadMask.position.z = - 300;
+const quadMask = new THREE.Mesh(
+	new THREE.PlaneGeometry(1, 1),
+	new THREE.MeshBasicMaterial({ color: 0xffaa00 }),
+);
+quadMask.position.z = -300;
 quadMask.scale.set(width / 2, height / 2, 1);
 sceneMask.add(quadMask);
 
@@ -128,18 +133,18 @@ const resetRenderer = (): undefined => {
 	if (renderer) {
 		renderer.dispose();
 	}
-	
+
 	renderer = new THREE.WebGLRenderer({
 		context: gl as unknown as WebGLRenderingContext,
 		antialias: true,
 		canvas: doc as unknown as HTMLCanvasElement,
 		alpha: true,
 	});
-	
+
 	renderer.setPixelRatio(doc.devicePixelRatio);
 	renderer.setSize(doc.width, doc.height);
 	renderer.autoClear = false;
-	
+
 	if (composerScene) {
 		composerScene.renderer = renderer;
 		if (composer1) {
@@ -212,7 +217,10 @@ const rtHeight = height / 2;
 
 //
 
-composerScene = new EffectComposer(renderer, new THREE.WebGLRenderTarget(rtWidth * 2, rtHeight * 2, rtParameters));
+composerScene = new EffectComposer(
+	renderer,
+	new THREE.WebGLRenderTarget(rtWidth * 2, rtHeight * 2, rtParameters),
+);
 
 const renderBackground = new RenderPass(sceneBG, cameraOrtho);
 const renderModel = new RenderPass(sceneModel, cameraPerspective);
@@ -232,7 +240,10 @@ renderScene = new TexturePass(composerScene.renderTarget2.texture);
 
 //
 
-composer1 = new EffectComposer(renderer, new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters));
+composer1 = new EffectComposer(
+	renderer,
+	new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters),
+);
 
 composer1.addPass(renderScene);
 // composer1.addPass(gammaCorrection);
@@ -241,7 +252,10 @@ composer1.addPass(effectVignette);
 
 //
 
-composer2 = new EffectComposer(renderer, new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters));
+composer2 = new EffectComposer(
+	renderer,
+	new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters),
+);
 
 composer2.addPass(renderScene);
 // composer2.addPass(gammaCorrection);
@@ -256,7 +270,10 @@ composer2.addPass(effectVignette);
 
 //
 
-composer3 = new EffectComposer(renderer, new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters));
+composer3 = new EffectComposer(
+	renderer,
+	new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters),
+);
 
 composer3.addPass(renderScene);
 // composer3.addPass(gammaCorrection);
@@ -266,7 +283,10 @@ composer3.addPass(effectVignette);
 
 //
 
-composer4 = new EffectComposer(renderer, new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters));
+composer4 = new EffectComposer(
+	renderer,
+	new THREE.WebGLRenderTarget(rtWidth, rtHeight, rtParameters),
+);
 
 composer4.addPass(renderScene);
 // composer4.addPass(gammaCorrection);
@@ -284,10 +304,10 @@ const onWindowResize = (): undefined => {
 	cameraPerspective.aspect = window.innerWidth / window.innerHeight;
 	cameraPerspective.updateProjectionMatrix();
 
-	cameraOrtho.left = - halfWidth;
+	cameraOrtho.left = -halfWidth;
 	cameraOrtho.right = halfWidth;
 	cameraOrtho.top = halfHeight;
-	cameraOrtho.bottom = - halfHeight;
+	cameraOrtho.bottom = -halfHeight;
 
 	cameraOrtho.updateProjectionMatrix();
 
@@ -313,18 +333,18 @@ const createMesh = (geometry: THREE.BufferGeometry, scene: THREE.Scene, scale: n
 	// diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 	const mat2 = new THREE.MeshPhongMaterial({
-
 		color: 0xcbcbcb,
 		specular: 0x080808,
 		shininess: 20,
 		map: diffuseMap,
-		normalMap: new THREE.TextureLoader().load(`${cwd}/textures/Infinite-Level_02_Tangent_SmoothUV.jpg`),
-		normalScale: new THREE.Vector2(0.75, 0.75)
-
+		normalMap: new THREE.TextureLoader().load(
+			`${cwd}/textures/Infinite-Level_02_Tangent_SmoothUV.jpg`,
+		),
+		normalScale: new THREE.Vector2(0.75, 0.75),
 	});
 
 	mesh = new THREE.Mesh(geometry, mat2);
-	mesh.position.set(0, - 50, 0);
+	mesh.position.set(0, -50, 0);
 	mesh.scale.set(scale, scale, scale);
 
 	scene.add(mesh);
@@ -362,16 +382,14 @@ loop((now) => {
 
 	renderer.setViewport(halfWidth, halfHeight, halfWidth, halfHeight);
 	composer4?.render(delta);
-	
+
 	if (!IS_PERF_MODE) {
 		return;
 	}
-	
+
 	frames++;
 	if (now >= prevTime + 2000) {
-		console.log(
-			'FPS:', Math.floor((frames * 1000) / (now - prevTime)),
-		);
+		console.log('FPS:', Math.floor((frames * 1000) / (now - prevTime)));
 		prevTime = now;
 		frames = 0;
 	}

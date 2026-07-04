@@ -10,7 +10,6 @@ import { fillPositionAndPhase, fillVelocity } from './utils/fill-data.ts';
 import { loopCommon } from './utils/loop-common.ts';
 import { BirdMesh } from './gl/bird-mesh.ts';
 
-
 const IS_PERF_MODE: boolean = true;
 const { screen, doc } = initCommon(IS_PERF_MODE, 'Boids GL');
 
@@ -24,17 +23,17 @@ const BIRDS: number = WIDTH * WIDTH;
 const BOUNDS: number = 800;
 
 type TPositionUniforms = {
-	time: THREE.Uniform,
-	delta: THREE.Uniform,
+	time: THREE.Uniform;
+	delta: THREE.Uniform;
 };
 
 type TVelocityUniforms = TPositionUniforms & {
-	testing: THREE.Uniform,
-	separationDistance: THREE.Uniform,
-	alignmentDistance: THREE.Uniform,
-	cohesionDistance: THREE.Uniform,
-	freedomFactor: THREE.Uniform,
-	predator: THREE.Uniform,
+	testing: THREE.Uniform;
+	separationDistance: THREE.Uniform;
+	alignmentDistance: THREE.Uniform;
+	cohesionDistance: THREE.Uniform;
+	freedomFactor: THREE.Uniform;
+	predator: THREE.Uniform;
 };
 
 const controls = new OrbitControls(screen.camera, doc as unknown as HTMLElement);
@@ -47,21 +46,25 @@ const dtVelocity = gpuCompute.createTexture();
 fillVelocity(dtVelocity.image.data);
 
 const velocityVariable: Variable = gpuCompute.addVariable(
-	'textureVelocity', fragmentShaderVelocity, dtVelocity,
+	'textureVelocity',
+	fragmentShaderVelocity,
+	dtVelocity,
 );
 const positionVariable: Variable = gpuCompute.addVariable(
-	'texturePosition', fragmentShaderPosition, dtPosition,
+	'texturePosition',
+	fragmentShaderPosition,
+	dtPosition,
 );
 
 gpuCompute.setVariableDependencies(velocityVariable, [positionVariable, velocityVariable]);
 gpuCompute.setVariableDependencies(positionVariable, [positionVariable, velocityVariable]);
 
-const positionUniforms: TPositionUniforms = (positionVariable.material.uniforms as TPositionUniforms);
-const velocityUniforms: TVelocityUniforms = (velocityVariable.material.uniforms as TVelocityUniforms);
+const positionUniforms: TPositionUniforms = positionVariable.material.uniforms as TPositionUniforms;
+const velocityUniforms: TVelocityUniforms = velocityVariable.material.uniforms as TVelocityUniforms;
 
 positionUniforms.delta = new THREE.Uniform(0.0);
 
-velocityUniforms.delta = new THREE.Uniform(0.0)
+velocityUniforms.delta = new THREE.Uniform(0.0);
 velocityUniforms.separationDistance = new THREE.Uniform(20.0);
 velocityUniforms.alignmentDistance = new THREE.Uniform(20.0);
 velocityUniforms.cohesionDistance = new THREE.Uniform(20.0);
@@ -83,16 +86,18 @@ screen.scene.add(birdMesh);
 
 loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	controls.update();
-	
+
 	positionUniforms.delta.value = delta;
-	
+
 	velocityUniforms.delta.value = delta;
 	velocityUniforms.predator.value.set(mouse[0], mouse[1], 0);
-	
+
 	gpuCompute.compute();
-	
-	birdMesh.uniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget(positionVariable).texture;
-	birdMesh.uniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
-	
+
+	birdMesh.uniforms.texturePosition.value =
+		gpuCompute.getCurrentRenderTarget(positionVariable).texture;
+	birdMesh.uniforms.textureVelocity.value =
+		gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
+
 	screen.draw();
 });

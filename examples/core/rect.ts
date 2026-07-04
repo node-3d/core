@@ -2,7 +2,6 @@ import * as three from 'three';
 
 import { Rect, Screen, init } from '@node-3d/core';
 
-
 const { loop } = init({
 	isGles3: true,
 	isWebGL2: true,
@@ -31,21 +30,25 @@ paint();
 
 let isMoving = false;
 
-screen.on('mousedown', () => { isMoving = true; });
-screen.on('mouseup', () => { isMoving = false; });
+screen.on('mousedown', () => {
+	isMoving = true;
+});
+screen.on('mouseup', () => {
+	isMoving = false;
+});
 
 screen.on('mousemove', (e) => {
 	const dx = mouse.x - e.x;
 	const dy = mouse.y - e.y;
-	
+
 	mouse.x = e.x;
 	mouse.y = e.y;
-	
+
 	paint();
-	
+
 	if (!isMoving) {
 		return;
 	}
-	
+
 	rect.pos = rect.pos.plused([-dx, dy]);
 });

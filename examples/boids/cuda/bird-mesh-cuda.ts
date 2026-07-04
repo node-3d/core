@@ -7,12 +7,14 @@ const birdVS: string = readFileSync('cuda/bird-vs.glsl').toString();
 const birdFS: string = readFileSync('cuda/bird-fs.glsl').toString();
 
 export type TBirdUniforms = {
-	color: THREE.Uniform,
+	color: THREE.Uniform;
 };
 
 // Custom Mesh - BirdGeometryCuda and point-cloud adjustments.
 export class BirdMeshCuda extends THREE.Mesh {
-	public get vbos(): TBirdVbos { return (this.geometry as BirdGeometryCuda).vbos; }
+	public get vbos(): TBirdVbos {
+		return (this.geometry as BirdGeometryCuda).vbos;
+	}
 	public uniforms: TBirdUniforms;
 
 	public constructor(population: number) {

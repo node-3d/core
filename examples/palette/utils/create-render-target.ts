@@ -6,19 +6,15 @@ const createRenderTarget = (
 	w: number,
 	h: number,
 ): THREE.WebGLRenderTarget => {
-	const newRt = new three.WebGLRenderTarget(
-		w,
-		h,
-		{
-			minFilter: three.LinearFilter,
-			magFilter: three.NearestFilter,
-			format: three.RGBAFormat,
-			colorSpace: three.LinearSRGBColorSpace,
-		}
-	);
-	
+	const newRt = new three.WebGLRenderTarget(w, h, {
+		minFilter: three.LinearFilter,
+		magFilter: three.NearestFilter,
+		format: three.RGBAFormat,
+		colorSpace: three.LinearSRGBColorSpace,
+	});
+
 	materialPost.uniforms.t.value = newRt.texture;
-	
+
 	return newRt;
 };
 

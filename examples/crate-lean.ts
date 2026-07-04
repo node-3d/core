@@ -3,7 +3,11 @@ import * as THREE from 'three';
 import { Screen, addThreeHelpers, init } from '@node-3d/core';
 
 const { loop } = init({
-	isGles3: true, vsync: true, autoEsc: true, autoFullscreen: true, title: 'Crate',
+	isGles3: true,
+	vsync: true,
+	autoEsc: true,
+	autoFullscreen: true,
+	title: 'Crate',
 });
 addThreeHelpers(THREE);
 const screen = new Screen({ three: THREE, fov: 70, z: 2 });

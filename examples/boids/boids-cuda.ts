@@ -63,10 +63,7 @@ const ptxPath = join(tmpdir(), '@node-3d/cuda-boids.ptx').replaceAll('\\', '/');
 const module = moduleRuntimeCompile('boids.cu', boidsSrc, ptxPath);
 const compileLog = module.log ?? '';
 
-if (
-	(typeof module.error === 'number' && module.error !== 0) ||
-	compileLog.includes('error:')
-) {
+if ((typeof module.error === 'number' && module.error !== 0) || compileLog.includes('error:')) {
 	throw new Error(`Failed to compile CUDA boids module: ${compileLog || 'no compiler log'}`);
 }
 
@@ -92,8 +89,10 @@ const kernelArgs = prepareArguments([
 	{ type: 'DevicePtr', value: 0 },
 	{ type: 'DevicePtr', value: 0 },
 ]);
-const maxFramesArg = process.argv.find(arg => arg.startsWith('--max-frames='));
-const maxFrames = maxFramesArg ? Number.parseInt(maxFramesArg.slice('--max-frames='.length), 10) : 0;
+const maxFramesArg = process.argv.find((arg) => arg.startsWith('--max-frames='));
+const maxFrames = maxFramesArg
+	? Number.parseInt(maxFramesArg.slice('--max-frames='.length), 10)
+	: 0;
 let frameCount = 0;
 
 loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
@@ -110,28 +109,30 @@ loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	kernelArgs.writeFloatLE(mouse[1] * BOUNDS, 16);
 
 	gl.finish();
-	
+
 	// NVIDIA requires CUDA to map graphics resources before CUDA use and unmap before GL reuse.
 	// https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__INTEROP.html
 	memPos.regVBO(gl.extractId(offsets.vbo));
 	memVel.regVBO(gl.extractId(velocity.vbo));
-	
+
 	try {
 		kernelArgs.writeBigUInt64LE(BigInt(memPos.devicePtr), 32);
 		kernelArgs.writeBigUInt64LE(BigInt(memVel.devicePtr), 40);
-		
+
 		const launchError = kernelUpdate.launchKernel(
 			[gridSize, 1, 1],
 			[THREADS_PER_BLOCK, 1, 1],
 			kernelArgs,
 		);
-		
+
 		if (launchError !== 0) {
-			throw new Error(`Failed to launch CUDA boids kernel on frame ${frameCount}: ${launchError}`);
+			throw new Error(
+				`Failed to launch CUDA boids kernel on frame ${frameCount}: ${launchError}`,
+			);
 		}
-		
+
 		const syncError = context.synchronize();
-		
+
 		if (syncError !== 0) {
 			throw new Error(`Failed to synchronize CUDA boids kernel: ${syncError}`);
 		}

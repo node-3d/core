@@ -12,33 +12,37 @@ export type TBrushOpts = TDrawableOpts & {
 
 export class Brush extends Drawable {
 	protected _size: number;
-	
+
 	public constructor(opts: TBrushOpts) {
 		super({ screen: opts.screen, color: opts.color });
-		
+
 		this._size = opts.size || 100;
 		this._pos = opts.pos ? new Vec2(opts.pos) : new Vec2();
-		
+
 		if (opts.visible !== undefined && !opts.visible) {
 			this.visible = false;
 		}
-		
+
 		this.screen.on('resize', () => {
 			const uniforms = this.shaderMaterial.uniforms;
 			uniforms.aspect.value = this.screen.w / this.screen.h;
 			uniforms.size.value = this._size / this.screen.h;
 		});
 	}
-	
-	public get size(): number { return this._size; }
+
+	public get size(): number {
+		return this._size;
+	}
 	public set size(value: number) {
 		this._size = value;
 		if (this.visible) {
 			this.shaderMaterial.uniforms.size.value = this._size;
 		}
 	}
-	
-	public override get pos(): Vec2 { return this._pos; }
+
+	public override get pos(): Vec2 {
+		return this._pos;
+	}
 	public override set pos(value: TVec2Source) {
 		this._pos.copy(value);
 		if (this.visible) {
@@ -48,11 +52,13 @@ export class Brush extends Drawable {
 			);
 		}
 	}
-	
-	public override get visible(): boolean { return super.visible; }
+
+	public override get visible(): boolean {
+		return super.visible;
+	}
 	public override set visible(value: boolean) {
 		super.visible = value;
-		
+
 		if (this.visible) {
 			const uniforms = this.shaderMaterial.uniforms;
 			uniforms.pos.value = new this.screen.three.Vector2(this._pos.x, this._pos.y);
@@ -64,8 +70,10 @@ export class Brush extends Drawable {
 			);
 		}
 	}
-	
-	public override get color(): Color { return this._color; }
+
+	public override get color(): Color {
+		return this._color;
+	}
 	public override set color(value: Color) {
 		this._color = value;
 		if (this.visible) {
@@ -76,7 +84,7 @@ export class Brush extends Drawable {
 			);
 		}
 	}
-	
+
 	public override _geo(): THREE.BufferGeometry {
 		const geo = new this.screen.three.PlaneGeometry(2, 2);
 		geo.computeBoundingSphere = () => {
@@ -89,7 +97,7 @@ export class Brush extends Drawable {
 		geo.computeBoundingBox();
 		return geo;
 	}
-	
+
 	public override _mat(): TMaterialWithCoreProps {
 		return new this.screen.three.ShaderMaterial({
 			side: this.screen.three.DoubleSide,
@@ -130,11 +138,11 @@ export class Brush extends Drawable {
 			transparent: true,
 		});
 	}
-	
+
 	public override _build(opts: TBrushOpts): TDrawableMesh {
 		return new this.screen.three.Mesh(this._geo(), this._mat()) as unknown as TDrawableMesh;
 	}
-	
+
 	private get shaderMaterial(): THREE.ShaderMaterial {
 		return this._mesh.material as THREE.ShaderMaterial;
 	}

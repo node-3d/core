@@ -17,15 +17,11 @@ import type { THueMode } from './utils/index.ts';
 
 const IS_PERF_MODE = !true;
 
-const hueModes: THueMode[] = [
-	'monochromatic', 'analagous', 'complementary', 'triadic', 'tetradic',
-];
+const hueModes: THueMode[] = ['monochromatic', 'analagous', 'complementary', 'triadic', 'tetradic'];
 
 const extraCodes = (glfw as unknown as { extraCodes: Record<number, number> }).extraCodes;
 
-const {
-	doc, loop,
-} = init({
+const { doc, loop } = init({
 	isGles3: true,
 	isWebGL2: true,
 	autoEsc: true,
@@ -47,7 +43,12 @@ screen.renderer.shadowMap.enabled = true;
 screen.camera.position.z = 9;
 
 const cameraOrtho = new THREE.OrthographicCamera(
-	-doc.w * 0.5, doc.w * 0.5, doc.h * 0.5, -doc.h * 0.5, - 10, 10,
+	-doc.w * 0.5,
+	doc.w * 0.5,
+	doc.h * 0.5,
+	-doc.h * 0.5,
+	-10,
+	10,
 );
 cameraOrtho.position.z = 5;
 
@@ -55,7 +56,9 @@ const controls = new OrbitControls(screen.camera, doc as unknown as HTMLElement)
 controls.update();
 
 let mesh: THREE.Object3D | null = null;
-populateScene(screen.scene, (m) => { mesh = m; });
+populateScene(screen.scene, (m) => {
+	mesh = m;
+});
 
 const scenePost = new THREE.Scene();
 
@@ -65,10 +68,17 @@ let modeHue = 0;
 let numColors = 9;
 
 const rawPalette0 = generatePalette(hueModes[modeHue], numColors);
-let palette = rawPalette0.map((c) => (new THREE.Color(...c)));
+let palette = rawPalette0.map((c) => new THREE.Color(...c));
 
 const fragmentShader = readFileSync('post.glsl').toString();
-let materialPost = createPostMaterial(THREE, numColors, isSwap, modeGrayscale, palette, fragmentShader);
+let materialPost = createPostMaterial(
+	THREE,
+	numColors,
+	isSwap,
+	modeGrayscale,
+	palette,
+	fragmentShader,
+);
 
 let rt: THREE.WebGLRenderTarget | null = createRenderTarget(THREE, materialPost, doc.w, doc.h);
 
@@ -110,7 +120,7 @@ const setPalette = (newValue: THREE.Color[]): void => {
 
 const setModeGrayscale = (newValue: number): void => {
 	modeGrayscale = isSwap && !newValue ? 1 : newValue;
-	
+
 	if (modeGrayscale === 1) {
 		console.log('Grayscale mode: Luminosity.');
 	} else if (modeGrayscale === 2) {
@@ -120,19 +130,19 @@ const setModeGrayscale = (newValue: number): void => {
 	} else {
 		console.log('Grayscale mode: OFF.');
 	}
-	
+
 	materialPost.uniforms.modeGrayscale.value = modeGrayscale;
 };
 
 const setIsSwap = (newValue: boolean): void => {
 	isSwap = newValue;
-	
+
 	if (isSwap && !modeGrayscale) {
 		setModeGrayscale(1);
 	} else if (!isSwap) {
 		setModeGrayscale(0);
 	}
-	
+
 	materialPost.uniforms.isSwap.value = isSwap;
 	for (let i = 0; i < palette.length; i++) {
 		colorQuads[i].visible = isSwap;
@@ -141,7 +151,7 @@ const setIsSwap = (newValue: boolean): void => {
 
 const randomizePalette = (): void => {
 	const rawPalette = generatePalette(hueModes[modeHue], numColors);
-	const colorPalette = rawPalette.map((c) => (new THREE.Color(...c)));
+	const colorPalette = rawPalette.map((c) => new THREE.Color(...c));
 	setPalette(colorPalette);
 };
 
@@ -155,18 +165,23 @@ const setNumColors = (newValue: number): void => {
 		return;
 	}
 	numColors = newValue;
-	
+
 	const rawPalette = generatePalette(hueModes[modeHue], numColors);
-	const colorPalette = rawPalette.map((c) => (new THREE.Color(...c)));
+	const colorPalette = rawPalette.map((c) => new THREE.Color(...c));
 	materialPost = createPostMaterial(
-		THREE, numColors, isSwap, modeGrayscale, colorPalette, fragmentShader,
+		THREE,
+		numColors,
+		isSwap,
+		modeGrayscale,
+		colorPalette,
+		fragmentShader,
 	);
 	materialPost.uniforms.t.value = rt?.texture ?? null;
-	
+
 	scenePost.remove(quadPost);
 	quadPost = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), materialPost);
 	scenePost.add(quadPost);
-	
+
 	randomizePalette();
 };
 
@@ -209,9 +224,9 @@ doc.on('resize', () => {
 	cameraOrtho.top = doc.h * 0.5;
 	cameraOrtho.bottom = -doc.h * 0.5;
 	cameraOrtho.updateProjectionMatrix();
-	
+
 	quadHelp.position.set(doc.w * 0.5 - 128, -doc.h * 0.5 + 128, 1);
-	
+
 	if (rt) {
 		rt.dispose();
 		rt = null;
@@ -224,7 +239,7 @@ const render = (): void => {
 	screen.renderer.setRenderTarget(rt);
 	screen.draw();
 	screen.renderer.setRenderTarget(rtOld);
-	
+
 	screen.renderer.render(scenePost, cameraOrtho);
 };
 
@@ -233,22 +248,20 @@ let frames = 0;
 
 loop((now) => {
 	controls.update();
-	
+
 	if (mesh) {
 		mesh.rotation.y = now * 0.00005;
 	}
-	
+
 	render();
-	
+
 	if (!IS_PERF_MODE) {
 		return;
 	}
-	
+
 	frames++;
 	if (now >= prevTime + 2000) {
-		console.log(
-			'FPS:', Math.floor((frames * 1000) / (now - prevTime)),
-		);
+		console.log('FPS:', Math.floor((frames * 1000) / (now - prevTime)));
 		prevTime = now;
 		frames = 0;
 	}
