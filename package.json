@@ -56,11 +56,12 @@
 		"@types/three": "0.174.0",
 		"@typescript/native-preview": "7.0.0-dev.20260704.1",
 		"oxlint": "1.72.0",
+		"tslib": "2.8.1",
 		"pixelmatch": "^6.0.0",
 		"pixi.js": "^7.3.1",
 		"three": "0.174.0",
-		"typescript": "6.0.3",
-		"oxfmt": "0.57.0"
+		"oxfmt": "0.57.0",
+		"typescript": "6.0.3"
 	},
 	"type": "module",
 	"types": "dist/index.d.ts",
