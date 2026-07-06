@@ -9,3 +9,6 @@ examples/core/*.jpg
 examples/core/*.png
 *.log
 test/__diff__
+dist/
+.rslib/
+*.tgz
