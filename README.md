@@ -10,8 +10,8 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 npm install @node-3d/core
 ```
 
-> This package uses pre-compiled Node.js addons. **There is no compilation** during `npm install`.
-The addons are compiled for: Win64, Linux64, Linux ARM64, MacOS ARM64.
+> This package uses precompiled Node.js addons. **There is no compilation** during `npm install`.
+The addons are compiled for: Windows x64, Linux x64, Linux ARM64, macOS ARM64.
 
 ![Example](examples/screenshot.png)
 
@@ -87,7 +87,7 @@ They are intentionally small wrappers around Three.js objects and raw GL resourc
 
 ## Example
 
-(As in [crate-lean.ts](/examples/crate-lean.ts)):
+(As in [crate-lean.ts](examples/crate-lean.ts)):
 
 ```javascript
 import * as THREE from 'three';
@@ -133,7 +133,7 @@ Example Notes:
 1. This is real **native OpenGL**, and you have direct access to GL resource IDs. This may be
 	useful for resource sharing and compute interop:
 	* [CUDA-GL interop](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__OPENGL.html).
-	* [OpenCL-GL interop](https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueAcquireGLObjects.html) - see [example](/examples/boids).
+	* [OpenCL-GL interop](https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueAcquireGLObjects.html) - see [example](examples/boids).
 	* [Context sharing](https://www.glfw.org/docs/latest/context_guide.html#context_sharing).
 1. The flag `isGles3` lets you use a **GL ES 3** preset, which is closest to "real" WebGL.
 	If set to `false`, WebGL stuff (such as three.js) will still work, but now with some hacks.
@@ -144,7 +144,7 @@ Example Notes:
 1. **Offscreen rendering** is possible on Windows and Linux, as demonstrated by the tests
 	running in GitHub Actions. There are test cases that generate and compare screenshots.
 1. OpenGL **context sharing** is enabled. You can obtain `HDC, HWND, CTX` for Windows and whatever
-	those are called on Linux and MacOS. See [@node-3d/glfw](https://github.com/node-3d/glfw).
+	those are called on Linux and macOS. See [@node-3d/glfw](https://github.com/node-3d/glfw).
 
 
 ## License
