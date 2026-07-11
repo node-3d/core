@@ -26,6 +26,7 @@
 		]
 	},
 	"include": [
+		"*.ts",
 		"ts/**/*.ts",
 		"test/**/*.ts",
 		"examples/**/*.ts"
