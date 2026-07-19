@@ -5,7 +5,7 @@ The aim of the simulation was to replicate the behavior of flocks of birds.
 Instead of controlling the interactions of an entire flock, however,
 the Boids simulation only specifies the behavior of each individual bird.
 
-```console
+```bash
 npm ci
 npm run gl
 npm run cl

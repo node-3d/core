@@ -6,7 +6,7 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 [![Lint](https://github.com/node-3d/core/actions/workflows/lint.yml/badge.svg)](https://github.com/node-3d/core/actions/workflows/lint.yml)
 [![Test](https://github.com/node-3d/core/actions/workflows/test.yml/badge.svg)](https://github.com/node-3d/core/actions/workflows/test.yml)
 
-```console
+```bash
 npm install @node-3d/core
 ```
 
