@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"@node-3d/core": "file:../..",
-		"pixi.js": "^7.3.1"
+		"pixi.js": "7.3.1"
 	},
 	"type": "module",
 	"engines": {
