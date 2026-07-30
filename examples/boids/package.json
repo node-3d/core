@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@node-3d/core": "file:../..",
-		"@node-3d/cuda": "file:../../../@node-3d/cuda",
+		"@node-3d/cuda": "~1.0.0",
 		"@node-3d/opencl": "~3.0.0"
 	},
 	"engines": {

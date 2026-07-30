@@ -1,8 +1,6 @@
 import type * as THREE from 'three';
 import type {
-	Document as GlfwDocument,
-	Window as GlfwWindow,
-	TDocumentOpts,
+	GlfwWindow as NativeGlfwWindow,
 	TEvent,
 	TImageData,
 	TSizeEvent,
@@ -11,10 +9,11 @@ import type {
 import type { Image } from '@node-3d/image';
 import type { TWebGL } from '@node-3d/webgl';
 
+import type { BrowserDocument, TBrowserDocumentOpts } from './core/browser-document.ts';
+import type { BrowserWindow } from './core/browser-window.ts';
 import type { WebVRManager } from './core/vr-manager.ts';
-import type { Vec2 } from './math/vec2.ts';
-import type { Vec3 } from './math/vec3.ts';
-import type { Vec4 } from './math/vec4.ts';
+import type { ResizeObserver } from './core/resize-observer.ts';
+import type { Vec2, Vec3, Vec4 } from './math/index.ts';
 
 export type TUnknownObject = Readonly<Record<string, unknown>>;
 export type TThree = typeof THREE;
@@ -29,10 +28,11 @@ export type TImageConstructor = typeof Image & {
 	};
 };
 export type TGlfw = typeof glfwNative & {
-	Document: typeof GlfwDocument;
-	Window: typeof GlfwWindow;
+	Document: typeof BrowserDocument;
+	GlfwWindow: typeof NativeGlfwWindow;
+	Window: typeof BrowserWindow;
 };
-export type TDocument = Omit<GlfwDocument, 'context' | 'getContext' | 'appendChild'> & {
+export type TDocument = Omit<BrowserDocument, 'context' | 'getContext' | 'appendChild'> & {
 	context: TWebgl;
 	getContext: (kind: string) => TWebgl | InstanceType<TImageConstructor> | null;
 	appendChild: (child?: unknown) => void;
@@ -161,7 +161,7 @@ export type TCore3D = {
 	raf: TDocument['requestAnimationFrame'];
 };
 
-export type TInitOpts = TDocumentOpts &
+export type TInitOpts = TBrowserDocumentOpts &
 	Readonly<{
 		isGles3?: boolean;
 		isWebGL2?: boolean;
@@ -180,6 +180,7 @@ export type TNode3DGlobal = {
 	cwrap?: null;
 	location?: TLocation;
 	navigator?: TNavigator;
+	ResizeObserver?: typeof ResizeObserver;
 	addEventListener?: TDocument['addEventListener'];
 	removeEventListener?: TDocument['removeEventListener'];
 	requestAnimationFrame?: TDocument['requestAnimationFrame'];

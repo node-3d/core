@@ -33,8 +33,8 @@ exists to illustrate how GLSL RTT compute can be swapped for OpenCL compute with
 ## Minor changes
 
 Compared to the original Three.js example there are several edits:
-* Added OrbitControls - you may look around and zoom. The mouse-predator is only correct for the
-initial view position.
+* Added OrbitControls - you may look around and zoom. The mouse-predator is projected
+onto the flock plane using the current camera.
 * The birds are colored according to their flight direction. The background is black.
 * Some GLSL changes, like removing the unused variables and improving readability.
 * Extracted some functions and primitives into separate modules. Extracted the inline shaders.

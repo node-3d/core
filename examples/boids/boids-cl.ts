@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as cl from '@node-3d/opencl';
 import { initCommon } from './utils/init-common.ts';
-import { loopCommon } from './utils/loop-common.ts';
+import { loopCommon, projectMouseToZPlane } from './utils/loop-common.ts';
 import { BirdMeshCl } from './cl/bird-mesh-cl.ts';
 import { fillPositionAndPhase, fillVelocity } from './utils/fill-data.ts';
 
@@ -77,10 +77,11 @@ cl.setKernelArg(kernelUpdate, 9, 'float*', memVel);
 
 loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	controls.update();
+	const predator = projectMouseToZPlane(screen, mouse);
 
 	cl.setKernelArg(kernelUpdate, 1, 'float', delta);
-	cl.setKernelArg(kernelUpdate, 3, 'float', mouse[0] * BOUNDS);
-	cl.setKernelArg(kernelUpdate, 4, 'float', mouse[1] * BOUNDS);
+	cl.setKernelArg(kernelUpdate, 3, 'float', predator[0]);
+	cl.setKernelArg(kernelUpdate, 4, 'float', predator[1]);
 
 	gl.finish();
 

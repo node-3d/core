@@ -14,7 +14,7 @@ import {
 	prepareArguments,
 } from '@node-3d/cuda';
 import { initCommon } from './utils/init-common.ts';
-import { loopCommon } from './utils/loop-common.ts';
+import { loopCommon, projectMouseToZPlane } from './utils/loop-common.ts';
 import { BirdMeshCuda } from './cuda/bird-mesh-cuda.ts';
 import { fillPositionAndPhase, fillVelocity } from './utils/fill-data.ts';
 
@@ -97,6 +97,7 @@ let frameCount = 0;
 
 loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	controls.update();
+	const predator = projectMouseToZPlane(screen, mouse);
 
 	const currentError = context.setCurrent();
 
@@ -105,8 +106,8 @@ loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	}
 
 	kernelArgs.writeFloatLE(delta, 4);
-	kernelArgs.writeFloatLE(mouse[0] * BOUNDS, 12);
-	kernelArgs.writeFloatLE(mouse[1] * BOUNDS, 16);
+	kernelArgs.writeFloatLE(predator[0], 12);
+	kernelArgs.writeFloatLE(predator[1], 16);
 
 	gl.finish();
 

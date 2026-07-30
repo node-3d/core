@@ -3,6 +3,8 @@ import { describe, it } from 'node:test';
 import * as three from 'three';
 import {
 	Brush,
+	BrowserDocument,
+	BrowserWindow,
 	Cloud,
 	Drawable,
 	gl,
@@ -164,6 +166,11 @@ const staticClasses: TStaticClasses = {
 describe('Node.js 3D Core', () => {
 	it('exports an object', () => {
 		assert.strictEqual(typeof inited, 'object');
+	});
+
+	it('exports browser classes', () => {
+		assert.strictEqual(typeof BrowserWindow, 'function');
+		assert.strictEqual(typeof BrowserDocument, 'function');
 	});
 
 	describe('Static classes', () => {

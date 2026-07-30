@@ -7,7 +7,7 @@ import type { Variable } from 'three/addons/misc/GPUComputationRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { initCommon } from './utils/init-common.ts';
 import { fillPositionAndPhase, fillVelocity } from './utils/fill-data.ts';
-import { loopCommon } from './utils/loop-common.ts';
+import { loopCommon, projectMouseToZPlane } from './utils/loop-common.ts';
 import { BirdMesh } from './gl/bird-mesh.ts';
 
 const IS_PERF_MODE: boolean = true;
@@ -84,13 +84,20 @@ if (error) {
 const birdMesh = new BirdMesh(BIRDS, WIDTH);
 screen.scene.add(birdMesh);
 
+const maxFramesArg = process.argv.find((arg) => arg.startsWith('--max-frames='));
+const maxFrames = maxFramesArg
+	? Number.parseInt(maxFramesArg.slice('--max-frames='.length), 10)
+	: 0;
+let frameCount = 0;
+
 loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	controls.update();
+	const predator = projectMouseToZPlane(screen, mouse);
 
 	positionUniforms.delta.value = delta;
 
 	velocityUniforms.delta.value = delta;
-	velocityUniforms.predator.value.set(mouse[0], mouse[1], 0);
+	velocityUniforms.predator.value.set(predator[0], predator[1], 0);
 
 	gpuCompute.compute();
 
@@ -100,4 +107,9 @@ loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 		gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 
 	screen.draw();
+
+	frameCount++;
+	if (maxFrames > 0 && frameCount >= maxFrames) {
+		process.exit(0);
+	}
 });

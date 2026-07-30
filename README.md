@@ -24,15 +24,15 @@ The addons are compiled for: Windows x64, Linux x64/ARM64, macOS ARM64.
 
 ### `init(opts?: TInitOpts): TCore3D`
 
-Initializes Node3D, creates the first `Document`, wires browser-like globals, and returns:
+Initializes Node3D, creates the first `BrowserDocument`, wires browser-like globals, and returns:
 
-* `doc` - the created `Document`, also assigned to `globalThis.document` and `globalThis.window`.
+* `doc` - the created `BrowserDocument`, also assigned to `globalThis.document` and `globalThis.window`.
 * `loop` - shortcut for `doc.loop`.
 * `raf` - shortcut for `doc.requestAnimationFrame`.
 
 `init()` is cached. Repeated calls return the first result and do not create another document.
 
-Options are mostly `@node-3d/glfw` `Document` options, plus:
+Options are mostly `BrowserDocument` window options, plus:
 
 * `isGles3` - request an OpenGL ES 3 style context and shader behavior, closest to WebGL.
 * `isWebGL2` - expose the context as WebGL2 to browser-style libraries.
@@ -53,9 +53,9 @@ Call this once before creating Three.js loaders/materials that depend on those b
 
 * `Screen`, `Surface`, `Points`, `Lines`, `Tris`, `Rect`, `Brush`
 * `Color`, `Vec2`, `Vec3`, `Vec4`
-* `Document`, `Window`, `Image`
+* `BrowserDocument`, `BrowserWindow`, `Document`, `Window`, `Image`
 * `gl` from `@node-3d/webgl`
-* `glfw` from `@node-3d/glfw`, with `glfw.Document` and `glfw.Window` attached
+* `glfw` from `@node-3d/glfw`, with core `glfw.Document`, `glfw.Window`, and native `glfw.GlfwWindow` attached
 
 ### `Screen`
 

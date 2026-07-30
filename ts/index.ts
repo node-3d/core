@@ -1,9 +1,12 @@
 import { webgl } from '@node-3d/webgl';
 import { Image } from '@node-3d/image';
-import { glfw as glfwNative, Window as GlfwWindow, Document as GlfwDocument } from '@node-3d/glfw';
-import type { Window as TGlfwWindow } from '@node-3d/glfw';
+import { GlfwWindow, glfw as glfwNative } from '@node-3d/glfw';
+import type { GlfwWindow as TGlfwWindow } from '@node-3d/glfw';
+import { BrowserDocument } from './core/browser-document.ts';
+import { BrowserWindow } from './core/browser-window.ts';
 import { location } from './core/location.ts';
 import { navigator } from './core/navigator.ts';
+import { ResizeObserver } from './core/resize-observer.ts';
 import { WebVRManager } from './core/vr-manager.ts';
 import type {
 	TCore3D,
@@ -17,15 +20,17 @@ import type {
 
 export { addThreeHelpers } from './core/threejs-helpers.ts';
 export { Image } from '@node-3d/image';
-export { Document, Window } from '@node-3d/glfw';
+export { BrowserDocument, BrowserDocument as Document } from './core/browser-document.ts';
+export { BrowserWindow, BrowserWindow as Window } from './core/browser-window.ts';
 
 export * from './math/index.ts';
 export * from './objects/index.ts';
 
 export const glfw: TGlfw = {
 	...glfwNative,
-	Document: GlfwDocument,
-	Window: GlfwWindow,
+	Document: BrowserDocument,
+	GlfwWindow,
+	Window: BrowserWindow,
 };
 export const gl = webgl;
 
@@ -41,8 +46,6 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 
 	const { Document } = glfw;
 
-	Document.setWebgl(gl);
-	Document.setImage(Image as unknown as Parameters<typeof Document.setImage>[0]);
 	const imagePrototype = Image.prototype as TImageConstructor['prototype'];
 	if (!imagePrototype.fillRect) {
 		imagePrototype.fillRect = () => {
@@ -116,6 +119,10 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 
 	if (!nodeGlobal.navigator) {
 		nodeGlobal.navigator = navigator;
+	}
+
+	if (!nodeGlobal.ResizeObserver) {
+		nodeGlobal.ResizeObserver = ResizeObserver;
 	}
 
 	nodeGlobal.WebVRManager = WebVRManager;
