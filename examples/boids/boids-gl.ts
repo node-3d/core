@@ -17,8 +17,10 @@ const fragmentShaderPosition: string = readFileSync('gl/position-fs.glsl').toStr
 const fragmentShaderVelocity: string = readFileSync('gl/velocity-fs.glsl').toString();
 
 /* Texture size for simulation */
-const WIDTH: number = 128; // 128^2 = 16384 birds. It ain't much, but it's honest work
+// const WIDTH: number = 128; // 128^2 = 16384 birds. It ain't much, but it's honest work
+const WIDTH: number = 256; // 256^2 = 65536 birds. A bit more.
 const BIRDS: number = WIDTH * WIDTH;
+console.log('Bird count:', BIRDS);
 
 const BOUNDS: number = 800;
 

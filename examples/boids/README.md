@@ -6,14 +6,13 @@ Instead of controlling the interactions of an entire flock, however,
 the Boids simulation only specifies the behavior of each individual bird.
 
 ```bash
-npm ci
-npm run gl
-npm run cl
-npm run cuda
+node boids-gl.ts
+node boids-cl.ts
+node boids-cuda.ts
 ```
 
-This example uses the packages "@node-3d/opencl" and "@node-3d/cuda", so a separate `npm ci`
-needs to be run here.
+The OpenCL and CUDA versions use `@node-3d/opencl` and `@node-3d/cuda`, which are installed
+with the core development dependencies.
 
 ![Example](screenshot.png)
 

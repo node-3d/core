@@ -18,7 +18,10 @@ import { loopCommon, projectMouseToZPlane } from './utils/loop-common.ts';
 import { BirdMeshCuda } from './cuda/bird-mesh-cuda.ts';
 import { fillPositionAndPhase, fillVelocity } from './utils/fill-data.ts';
 
-const BIRDS: number = 128 * 128; // 16384
+// const WIDTH: number = 128; // 128^2 = 16384 birds. It ain't much, but it's honest work
+const WIDTH: number = 256; // 256^2 = 65536 birds. A bit more.
+const BIRDS: number = WIDTH * WIDTH;
+console.log('Bird count:', BIRDS);
 const BOUNDS: number = 800;
 const IS_PERF_MODE: boolean = true;
 const THREADS_PER_BLOCK: number = 256;
