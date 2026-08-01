@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { Image } from '@node-3d/image';
 import type { TWebgl } from '../types.ts';
 
 export type TScreenshotContext = Pick<TWebgl, 'RGBA' | 'UNSIGNED_BYTE' | 'readPixels'>;
@@ -11,21 +12,10 @@ export type TScreenshotImage = {
 	save: (name: string) => boolean;
 };
 
-export type TScreenshotImageConstructor = {
-	fromPixels: (width: number, height: number, bpp: number, data: Buffer) => TScreenshotImage;
-	loadAsync: (name: string) => Promise<TScreenshotImage>;
-};
-
-export type TScreenshotTarget = Readonly<{
-	width: number;
-	height: number;
+export type TScreenshotDocument = Readonly<{
+	w: number;
+	h: number;
 	context: TScreenshotContext;
-	Image: TScreenshotImageConstructor;
-}>;
-
-export type TScreenshotPaths = Readonly<{
-	diffDir: string;
-	screenshotsDir: string;
 }>;
 
 export type TScreenshotReportLevel = 'error' | 'info' | 'warn';
@@ -40,28 +30,34 @@ export type TScreenshotOptions = Partial<
 	Readonly<{
 		pixelThreshold: number;
 		maxFailedPixels: number;
-		paths: Partial<TScreenshotPaths>;
+		diffDir: string;
+		screenshotsDir: string;
 		report: TScreenshotReporter;
 	}>
 >;
 
+export type TScreenshotMatchOptions = TScreenshotOptions & Readonly<{ doc: TScreenshotDocument }>;
+
+type TNormalizedScreenshotOptions = Readonly<{
+	doc: TScreenshotDocument;
+	pixelThreshold: number;
+	maxFailedPixels: number;
+	diffDir: string;
+	screenshotsDir: string;
+	report: TScreenshotReporter | null;
+}>;
+
 const defaultOptions = {
 	pixelThreshold: 0.2,
 	maxFailedPixels: 100,
-	paths: {
-		diffDir: 'test/__diff__',
-		screenshotsDir: '__screenshots__',
-	},
+	diffDir: 'test/__diff__',
+	screenshotsDir: 'test/__screenshots__',
 	report: null as TScreenshotReporter | null,
 } as const;
 
-const normalizeOptions = (opts: TScreenshotOptions = {}) => ({
+const normalizeOptions = (opts: TScreenshotMatchOptions): TNormalizedScreenshotOptions => ({
 	...defaultOptions,
 	...opts,
-	paths: {
-		...defaultOptions.paths,
-		...opts.paths,
-	},
 });
 
 const ensureParentDir = async (path: string): Promise<void> => {
@@ -77,38 +73,40 @@ const pathExists = async (path: string): Promise<boolean> => {
 	}
 };
 
-const makePathDiff = (name: string, paths: TScreenshotPaths): string =>
-	`${paths.diffDir}/${name}.png`;
+const makePathDiff = (name: string, opts: Pick<TScreenshotMatchOptions, 'diffDir'>): string =>
+	`${opts.diffDir}/${name}.png`;
 
-const makePathExpected = (name: string, paths: TScreenshotPaths): string =>
-	`${paths.diffDir}/${name}__expected__.png`;
+const makePathExpected = (name: string, opts: Pick<TScreenshotMatchOptions, 'diffDir'>): string =>
+	`${opts.diffDir}/${name}__expected__.png`;
 
-const makePathActual = (name: string, paths: TScreenshotPaths): string =>
-	`${paths.diffDir}/${name}__actual__.png`;
+const makePathActual = (name: string, opts: Pick<TScreenshotMatchOptions, 'diffDir'>): string =>
+	`${opts.diffDir}/${name}__actual__.png`;
 
-const makePathExport = (name: string, paths: TScreenshotPaths): string =>
-	`${paths.screenshotsDir}/${name}.png`;
+const makePathExport = (
+	name: string,
+	opts: Pick<TScreenshotMatchOptions, 'screenshotsDir'>,
+): string => `${opts.screenshotsDir}/${name}.png`;
 
-const allocBuffer = (target: TScreenshotTarget): Buffer => {
-	const memSize = target.width * target.height * 4;
+const allocBuffer = (doc: TScreenshotDocument): Buffer => {
+	const memSize = doc.w * doc.h * 4;
 	return Buffer.allocUnsafeSlow(memSize);
 };
 
-const getImage = (target: TScreenshotTarget): TScreenshotImage | null => {
+const getImage = (doc: TScreenshotDocument): TScreenshotImage | null => {
 	try {
-		const storage = { data: allocBuffer(target) };
+		const storage = { data: allocBuffer(doc) };
 
-		target.context.readPixels(
+		doc.context.readPixels(
 			0,
 			0,
-			target.width,
-			target.height,
-			target.context.RGBA,
-			target.context.UNSIGNED_BYTE,
+			doc.w,
+			doc.h,
+			doc.context.RGBA,
+			doc.context.UNSIGNED_BYTE,
 			storage,
 		);
 
-		return target.Image.fromPixels(target.width, target.height, 32, storage.data);
+		return Image.fromPixels(doc.w, doc.h, 32, storage.data);
 	} catch {
 		return null;
 	}
@@ -128,12 +126,11 @@ const loadPixelmatch = async () => {
 
 export const makeScreenshot = async (
 	name: string,
-	target: TScreenshotTarget,
-	opts: TScreenshotOptions = {},
+	opts: TScreenshotMatchOptions,
 ): Promise<boolean> => {
-	const { paths, report } = normalizeOptions(opts);
-	const path = makePathExport(name, paths);
-	const img = getImage(target);
+	const { doc, report, screenshotsDir } = normalizeOptions(opts);
+	const path = makePathExport(name, { screenshotsDir });
+	const img = getImage(doc);
 
 	if (!img) {
 		return false;
@@ -147,28 +144,28 @@ export const makeScreenshot = async (
 
 export const compareScreenshot = async (
 	name: string,
-	target: TScreenshotTarget,
-	opts: TScreenshotOptions = {},
+	opts: TScreenshotMatchOptions,
 ): Promise<boolean> => {
-	const { maxFailedPixels, paths, pixelThreshold, report } = normalizeOptions(opts);
-	const path = makePathExport(name, paths);
+	const { diffDir, doc, maxFailedPixels, pixelThreshold, report, screenshotsDir } =
+		normalizeOptions(opts);
+	const path = makePathExport(name, { screenshotsDir });
 
 	if (!(await pathExists(path))) {
 		report?.('error', `Warning! No such screenshot: ${name}.`);
 		return false;
 	}
 
-	const actualImage = getImage(target);
+	const actualImage = getImage(doc);
 	if (!actualImage?.data) {
 		return false;
 	}
 
-	const expectedImage = await target.Image.loadAsync(path);
+	const expectedImage = await Image.loadAsync(path);
 	if (!expectedImage.data) {
 		return false;
 	}
 
-	const diff = allocBuffer(target);
+	const diff = allocBuffer(doc);
 	const pixelmatch = await loadPixelmatch();
 	const numFailedPixels = pixelmatch(
 		expectedImage.data,
@@ -190,15 +187,15 @@ export const compareScreenshot = async (
 
 	report?.('warn', `Screenshot: ${name} - ${numFailedPixels}/${maxFailedPixels}.`);
 
-	const pathDiff = makePathDiff(name, paths);
-	const pathExpected = makePathExpected(name, paths);
-	const pathActual = makePathActual(name, paths);
+	const pathDiff = makePathDiff(name, { diffDir });
+	const pathExpected = makePathExpected(name, { diffDir });
+	const pathActual = makePathActual(name, { diffDir });
 
 	await ensureParentDir(pathDiff);
 	actualImage.save(pathActual);
 	expectedImage.save(pathExpected);
 
-	const diffImage = target.Image.fromPixels(target.width, target.height, 32, diff);
+	const diffImage = Image.fromPixels(doc.w, doc.h, 32, diff);
 	diffImage.save(pathDiff);
 
 	const isError = numFailedPixels >= maxFailedPixels;
@@ -216,22 +213,21 @@ export const compareScreenshot = async (
 
 export const matchScreenshot = async (
 	name: string,
-	target: TScreenshotTarget,
-	opts: TScreenshotOptions = {},
+	opts: TScreenshotMatchOptions,
 ): Promise<boolean> => {
 	try {
-		const { paths } = normalizeOptions(opts);
-		const path = makePathExport(name, paths);
+		const { screenshotsDir } = normalizeOptions(opts);
+		const path = makePathExport(name, { screenshotsDir });
 
 		// oxlint-disable-next-line node/no-process-env
 		const isCi = !!process.env['CI'];
 		const hasFile = await pathExists(path);
 
 		if (!hasFile && !isCi) {
-			return await makeScreenshot(name, target, opts);
+			return await makeScreenshot(name, opts);
 		}
 
-		return compareScreenshot(name, target, opts);
+		return compareScreenshot(name, opts);
 	} catch (error) {
 		normalizeOptions(opts).report?.('error', 'Unable to match screenshot.', error);
 		return false;

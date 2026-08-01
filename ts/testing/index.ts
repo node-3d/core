@@ -3,11 +3,10 @@ export {
 	makeScreenshot,
 	matchScreenshot,
 	type TScreenshotContext,
+	type TScreenshotDocument,
 	type TScreenshotImage,
-	type TScreenshotImageConstructor,
+	type TScreenshotMatchOptions,
 	type TScreenshotOptions,
-	type TScreenshotPaths,
 	type TScreenshotReporter,
 	type TScreenshotReportLevel,
-	type TScreenshotTarget,
 } from './screenshot.ts';

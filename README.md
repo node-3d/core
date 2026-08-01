@@ -47,15 +47,29 @@ Patches a Three.js module instance for Node3D:
 
 Call this once before creating Three.js loaders/materials that depend on those behaviors.
 
-### Re-exports
+### Core Exports
 
-`@node-3d/core` re-exports the common pieces needed by apps:
+`@node-3d/core` implements the browser-like runtime and lightweight scene helpers:
 
-* `Screen`, `Surface`, `Points`, `Lines`, `Tris`, `Rect`, `Brush`
-* `Color`, `Vec2`, `Vec3`, `Vec4`
-* `BrowserDocument`, `BrowserWindow`, `Document`, `Window`, `Image`
-* `gl` from `@node-3d/webgl`
-* `glfw` from `@node-3d/glfw`, with core `glfw.Document`, `glfw.Window`, and native `glfw.GlfwWindow` attached
+* `BrowserDocument` / `Document` - browser-compatible document/window object backed by a GLFW window.
+* `BrowserWindow` / `Window` - browser-style window API layered on top of native GLFW window behavior.
+* `Screen` - high-level Three.js screen helper with renderer, scene, camera, events, and snapshots.
+* `Surface` - nested render surface for rendering a scene into a texture.
+* `Points` - point cloud drawable backed by GL buffers.
+* `Lines` - line, segment, or loop drawable backed by GL buffers.
+* `Tris` - triangle drawable backed by GL buffers.
+* `Rect` - 2D rectangle drawable.
+* `Brush` - mouse/paint-style rectangle helper.
+* `Color` - RGBA color helper accepting CSS hex strings, integers, arrays, vectors, and color objects.
+* `Vec2`, `Vec3`, `Vec4` - small vector helpers used by core drawables and geometry utilities.
+
+### Package Re-exports
+
+`@node-3d/core` also re-exports lower-level packages commonly needed by apps:
+
+* `Image` from [@node-3d/image](https://github.com/node-3d/image).
+* `gl` from [@node-3d/webgl](https://github.com/node-3d/webgl).
+* `glfw` from [@node-3d/glfw](https://github.com/node-3d/glfw).
 
 ### Testing
 
@@ -68,19 +82,15 @@ npm install --save-dev pixelmatch
 
 ```typescript
 import { matchScreenshot } from '@node-3d/core/testing';
-import { Image } from '@node-3d/core';
 
 assert.ok(await matchScreenshot('ui', {
-	width: doc.w,
-	height: doc.h,
-	context: doc.context,
-	Image,
+	doc,
 }));
 ```
 
-By default, baselines are read from `__screenshots__` and diffs are written to `test/__diff__`.
+By default, baselines are read from `test/__screenshots__` and diffs are written to `test/__diff__`.
 
-### `Screen`
+### Class Screen
 
 `Screen` is the high-level Three.js helper. It creates or accepts a camera, scene, and renderer,
 binds them to the Node3D document, forwards input events, and recreates the renderer when the

@@ -1,9 +1,8 @@
 import { webgl } from '@node-3d/webgl';
 import { Image } from '@node-3d/image';
-import { GlfwWindow, glfw as glfwNative } from '@node-3d/glfw';
+import { glfw as glfwNative } from '@node-3d/glfw';
 import type { GlfwWindow as TGlfwWindow } from '@node-3d/glfw';
 import { BrowserDocument } from './core/browser-document.ts';
-import { BrowserWindow } from './core/browser-window.ts';
 import { location } from './core/location.ts';
 import { navigator } from './core/navigator.ts';
 import { ResizeObserver } from './core/resize-observer.ts';
@@ -26,12 +25,7 @@ export { BrowserWindow, BrowserWindow as Window } from './core/browser-window.ts
 export * from './math/index.ts';
 export * from './objects/index.ts';
 
-export const glfw: TGlfw = {
-	...glfwNative,
-	Document: BrowserDocument,
-	GlfwWindow,
-	Window: BrowserWindow,
-};
+export const glfw: TGlfw = glfwNative;
 export const gl = webgl;
 
 // oxlint-disable-next-line max-lines-per-function
@@ -43,8 +37,6 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 	};
 
 	const { isWebGL2, isGles3, isVisible, ...optsDoc } = opts;
-
-	const { Document } = glfw;
 
 	const imagePrototype = Image.prototype as TImageConstructor['prototype'];
 	if (!imagePrototype.fillRect) {
@@ -92,7 +84,7 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 			);
 	}
 
-	const doc = new Document({ ...optsDoc, onBeforeWindow }) as unknown as TDocument;
+	const doc = new BrowserDocument({ ...optsDoc, onBeforeWindow }) as unknown as TDocument;
 	const nodeGlobal = globalThis as unknown as TNode3DGlobal;
 
 	if (!nodeGlobal.self) {

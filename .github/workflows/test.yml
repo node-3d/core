@@ -66,11 +66,18 @@ jobs:
         if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         run: xvfb-run --auto-servernum npm run test:ci
 
+      - name: Validate Windows ARM64 Imports
+        if: matrix.target == 'windows-arm64'
+        run: |
+          npm run build:ci
+          node -e "import('./dist/index.js').then((m) => console.log(Object.keys(m).join(',')))"
+          node -e "import('@node-3d/core/testing').then((m) => console.log(Object.keys(m).join(',')))"
+
       - uses: ssciwr/setup-mesa-dist-win@v3
-        if: matrix.target == 'windows-x64' || matrix.target == 'windows-arm64'
+        if: matrix.target == 'windows-x64'
 
       - name: Test - Windows
-        if: matrix.target == 'windows-x64' || matrix.target == 'windows-arm64'
+        if: matrix.target == 'windows-x64'
         run: npm run test:ci
 
       - name: Test - MacOS

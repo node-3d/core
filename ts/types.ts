@@ -1,16 +1,9 @@
 import type * as THREE from 'three';
-import type {
-	GlfwWindow as NativeGlfwWindow,
-	TEvent,
-	TImageData,
-	TSizeEvent,
-	glfw as glfwNative,
-} from '@node-3d/glfw';
+import type { TEvent, TImageData, TSizeEvent, glfw as glfwNative } from '@node-3d/glfw';
 import type { Image } from '@node-3d/image';
 import type { TWebGL } from '@node-3d/webgl';
 
 import type { BrowserDocument, TBrowserDocumentOpts } from './core/browser-document.ts';
-import type { BrowserWindow } from './core/browser-window.ts';
 import type { WebVRManager } from './core/vr-manager.ts';
 import type { ResizeObserver } from './core/resize-observer.ts';
 import type { Vec2, Vec3, Vec4 } from './math/index.ts';
@@ -27,11 +20,7 @@ export type TImageConstructor = typeof Image & {
 		fillRect?: () => void;
 	};
 };
-export type TGlfw = typeof glfwNative & {
-	Document: typeof BrowserDocument;
-	GlfwWindow: typeof NativeGlfwWindow;
-	Window: typeof BrowserWindow;
-};
+export type TGlfw = typeof glfwNative;
 export type TDocument = Omit<BrowserDocument, 'context' | 'getContext' | 'appendChild'> & {
 	context: TWebgl;
 	getContext: (kind: string) => TWebgl | InstanceType<TImageConstructor> | null;
