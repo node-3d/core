@@ -80,6 +80,10 @@ jobs:
         if: matrix.target == 'windows-x64'
         run: npm run test:ci
 
+      - name: Probe MacOS OpenGL
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
+        run: node .github/scripts/probe-macos-gl.mjs
+
       - name: Test - MacOS
         if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
         run: npm run test:ci
