@@ -1,4 +1,7 @@
 name: Test
+defaults:
+  run:
+    shell: bash
 
 on:
   push:
@@ -9,10 +12,30 @@ on:
       - master
 
 jobs:
-  Test:
+  unit-tests:
+    name: Unit Tests (${{ matrix.target }})
     strategy:
-        matrix:
-          os: [ubuntu-22.04, ubuntu-22.04-arm, windows-2022, macos-26]
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-x64
+            os: windows-2022
+            node_arch: x64
+          - target: windows-arm64
+            os: windows-11-arm
+            node_arch: arm64
+          - target: linux-x64
+            os: ubuntu-22.04
+            node_arch: x64
+          - target: linux-arm64
+            os: ubuntu-22.04-arm
+            node_arch: arm64
+          - target: darwin-x64
+            os: macos-26
+            node_arch: x64
+          - target: darwin-arm64
+            os: macos-26
+            node_arch: arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -27,31 +50,37 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24.13.0
+          architecture: ${{ matrix.node_arch }}
           cache: 'npm'
+
+      - name: Print Native Target
+        run: |
+          echo "runner=$(uname -s)-$(uname -m)"
+          node -p "'node=' + process.version + ' platform=' + process.platform + ' arch=' + process.arch"
+          npm config get arch
 
       - name: Install Modules
         run: npm ci
 
       - name: Tests - Linux
-        if: matrix.os == 'ubuntu-22.04' || matrix.os == 'ubuntu-22.04-arm'
+        if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         run: xvfb-run --auto-servernum npm run test:ci
 
       - uses: ssciwr/setup-mesa-dist-win@v3
-        if: matrix.os == 'windows-2022'
+        if: matrix.target == 'windows-x64' || matrix.target == 'windows-arm64'
 
       - name: Test - Windows
-        shell: bash
-        if: matrix.os == 'windows-2022'
+        if: matrix.target == 'windows-x64' || matrix.target == 'windows-arm64'
         run: npm run test:ci
 
-      # - name: Test - MacOS
-      #   if: matrix.os == 'macos-26'
-      #   run: npm run test:ci
+      - name: Test - MacOS
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
+        run: npm run test:ci
 
       - uses: actions/upload-artifact@v7
-        if: matrix.os != 'macos-26'
+        if: matrix.target != 'darwin-x64' && matrix.target != 'darwin-arm64'
         with:
-          name: __diff__
+          name: __diff__-${{ matrix.target }}
           path: test/__diff__
           retention-days: 1
           compression-level: 0
