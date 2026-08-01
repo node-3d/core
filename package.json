@@ -50,7 +50,13 @@
 		"@node-3d/webgl": "~6.0.0"
 	},
 	"peerDependencies": {
+		"pixelmatch": ">=6.0.0 <7",
 		"three": ">=0.174.0 <1"
+	},
+	"peerDependenciesMeta": {
+		"pixelmatch": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@node-3d/cuda": "~1.0.0",
@@ -73,6 +79,10 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
+		},
+		"./testing": {
+			"types": "./dist/testing/index.d.ts",
+			"default": "./dist/testing.js"
 		}
 	},
 	"bugs": {

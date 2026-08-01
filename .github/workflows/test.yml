@@ -77,8 +77,18 @@ jobs:
         if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
         run: npm run test:ci
 
-      - uses: actions/upload-artifact@v7
+      - name: Check Diff Artifacts
+        id: diff-artifacts
         if: matrix.target != 'darwin-x64' && matrix.target != 'darwin-arm64'
+        run: |
+          if [ -d test/__diff__ ] && find test/__diff__ -type f | read -r _; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: steps.diff-artifacts.outputs.present == 'true'
         with:
           name: __diff__-${{ matrix.target }}
           path: test/__diff__

@@ -57,6 +57,29 @@ Call this once before creating Three.js loaders/materials that depend on those b
 * `gl` from `@node-3d/webgl`
 * `glfw` from `@node-3d/glfw`, with core `glfw.Document`, `glfw.Window`, and native `glfw.GlfwWindow` attached
 
+### Testing
+
+`@node-3d/core/testing` exports optional screenshot helpers for visual tests. Install
+`pixelmatch` in the testing package when using them:
+
+```bash
+npm install --save-dev pixelmatch
+```
+
+```typescript
+import { matchScreenshot } from '@node-3d/core/testing';
+import { Image } from '@node-3d/core';
+
+assert.ok(await matchScreenshot('ui', {
+	width: doc.w,
+	height: doc.h,
+	context: doc.context,
+	Image,
+}));
+```
+
+By default, baselines are read from `__screenshots__` and diffs are written to `test/__diff__`.
+
 ### `Screen`
 
 `Screen` is the high-level Three.js helper. It creates or accepts a camera, scene, and renderer,
