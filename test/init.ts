@@ -47,7 +47,7 @@ const initOptsMacos: TInitOpts = {
 	isVisible: false,
 	onBeforeWindow(_window, currentGlfw) {
 		const windowGlfw = currentGlfw as TGlfw;
-		windowGlfw.windowHint(windowGlfw.CONTEXT_CREATION_API, windowGlfw.OSMESA_CONTEXT_API);
+		windowGlfw.windowHint(windowGlfw.CONTEXT_CREATION_API, windowGlfw.EGL_CONTEXT_API);
 		windowGlfw.windowHint(windowGlfw.STENCIL_BITS, 8);
 		windowGlfw.windowHint(windowGlfw.DEPTH_BITS, 0);
 		windowGlfw.windowHint(windowGlfw.SAMPLES, 0);

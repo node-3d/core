@@ -69,6 +69,8 @@ jobs:
           mesa_prefix="$(brew --prefix mesa)"
           echo "DYLD_LIBRARY_PATH=$mesa_prefix/lib:${DYLD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
           echo "DYLD_FALLBACK_LIBRARY_PATH=$mesa_prefix/lib:${DYLD_FALLBACK_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+          echo "LIBGL_ALWAYS_SOFTWARE=1" >> "$GITHUB_ENV"
+          echo "MESA_LOADER_DRIVER_OVERRIDE=llvmpipe" >> "$GITHUB_ENV"
           find "$mesa_prefix/lib" -maxdepth 1 \( -name '*OSMesa*' -o -name '*EGL*' -o -name '*GL*' \) -print
 
       - name: Tests - Linux

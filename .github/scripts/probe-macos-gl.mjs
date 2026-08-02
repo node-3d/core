@@ -59,6 +59,12 @@ const probes = [
 		window: 'osmesa',
 	},
 	{
+		name: 'BrowserDocument Null EGL hidden',
+		kind: 'document',
+		platform: 'null',
+		window: 'egl',
+	},
+	{
 		name: 'Core init Cocoa hidden no depth/stencil',
 		kind: 'core',
 		platform: 'cocoa',
@@ -69,6 +75,12 @@ const probes = [
 		kind: 'core',
 		platform: 'null',
 		window: 'osmesa',
+	},
+	{
+		name: 'Core init Null EGL hidden',
+		kind: 'core',
+		platform: 'null',
+		window: 'egl',
 	},
 ];
 
@@ -134,6 +146,10 @@ const describeGlfw = (glfw) => {
 	log('glfw DEPTH_BITS', glfw.DEPTH_BITS);
 	log('glfw SAMPLES', glfw.SAMPLES);
 	log('glfw DONT_CARE', glfw.DONT_CARE);
+	log('DYLD_LIBRARY_PATH', process.env['DYLD_LIBRARY_PATH']);
+	log('DYLD_FALLBACK_LIBRARY_PATH', process.env['DYLD_FALLBACK_LIBRARY_PATH']);
+	log('LIBGL_ALWAYS_SOFTWARE', process.env['LIBGL_ALWAYS_SOFTWARE']);
+	log('MESA_LOADER_DRIVER_OVERRIDE', process.env['MESA_LOADER_DRIVER_OVERRIDE']);
 	log('glfw property names', Object.getOwnPropertyNames(glfw).length);
 	log('glfw enumerable keys', Object.keys(glfw).length);
 };
