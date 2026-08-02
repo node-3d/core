@@ -62,6 +62,15 @@ jobs:
       - name: Install Modules
         run: npm ci
 
+      - name: Install MacOS OpenGL Runtime
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
+        run: |
+          brew install mesa
+          mesa_prefix="$(brew --prefix mesa)"
+          echo "DYLD_LIBRARY_PATH=$mesa_prefix/lib:${DYLD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+          echo "DYLD_FALLBACK_LIBRARY_PATH=$mesa_prefix/lib:${DYLD_FALLBACK_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+          find "$mesa_prefix/lib" -maxdepth 1 \( -name '*OSMesa*' -o -name '*EGL*' -o -name '*GL*' \) -print
+
       - name: Tests - Linux
         if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         run: xvfb-run --auto-servernum npm run test:ci
