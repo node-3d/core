@@ -5,87 +5,89 @@ const childArg = '--child';
 
 const probes = [
 	{
-		name: 'GlfwWindow Cocoa hidden default',
+		name: 'glfw/cocoa/default',
 		kind: 'glfw',
 		platform: 'cocoa',
 		window: 'hidden',
 	},
 	{
-		name: 'GlfwWindow Cocoa hidden no depth/stencil',
+		name: 'glfw/cocoa/loose',
 		kind: 'glfw',
 		platform: 'cocoa',
 		window: 'loose',
 	},
 	{
-		name: 'GlfwWindow Cocoa hidden dont-care framebuffer',
+		name: 'glfw/cocoa/dont-care',
 		kind: 'glfw',
 		platform: 'cocoa',
 		window: 'dont-care',
 	},
 	{
-		name: 'GlfwWindow Cocoa hidden core profile',
+		name: 'glfw/cocoa/core',
 		kind: 'glfw',
 		platform: 'cocoa',
 		window: 'core-profile',
 	},
 	{
-		name: 'GlfwWindow Null hidden default',
+		name: 'glfw/null/default',
 		kind: 'glfw',
 		platform: 'null',
 		window: 'hidden',
 	},
 	{
-		name: 'GlfwWindow Null OSMesa hidden',
+		name: 'glfw/null/osmesa',
 		kind: 'glfw',
 		platform: 'null',
 		window: 'osmesa',
 	},
 	{
-		name: 'GlfwWindow Null EGL hidden',
+		name: 'glfw/null/egl',
 		kind: 'glfw',
 		platform: 'null',
 		window: 'egl',
 	},
 	{
-		name: 'BrowserDocument Cocoa hidden no depth/stencil',
+		name: 'doc/cocoa/loose',
 		kind: 'document',
 		platform: 'cocoa',
 		window: 'loose',
 	},
 	{
-		name: 'BrowserDocument Null OSMesa hidden',
+		name: 'doc/null/osmesa',
 		kind: 'document',
 		platform: 'null',
 		window: 'osmesa',
 	},
 	{
-		name: 'BrowserDocument Null EGL hidden',
+		name: 'doc/null/egl',
 		kind: 'document',
 		platform: 'null',
 		window: 'egl',
 	},
 	{
-		name: 'Core init Cocoa hidden no depth/stencil',
+		name: 'core/cocoa/loose',
 		kind: 'core',
 		platform: 'cocoa',
 		window: 'loose',
 	},
 	{
-		name: 'Core init Null OSMesa hidden',
+		name: 'core/null/osmesa',
 		kind: 'core',
 		platform: 'null',
 		window: 'osmesa',
 	},
 	{
-		name: 'Core init Null EGL hidden',
+		name: 'core/null/egl',
 		kind: 'core',
 		platform: 'null',
 		window: 'egl',
 	},
 ];
 
+const reportPrefix = '__NODE_3D_GL_PROBE__';
+
 const log = (...args) => {
-	console.log('[macos-gl-probe]', ...args);
+	console.log('[gl]', ...args);
 };
 
 const asMessage = (error) => {
@@ -97,21 +99,63 @@ const asMessage = (error) => {
 
 const boolFromExitCode = (code) => code === 0;
 
+const uniq = (values) => [...new Set(values)];
+
+const extractGlfwErrors = (output) =>
+	uniq(
+		output
+			.split(/\r?\n/u)
+			.map((line) => line.trim())
+			.filter((line) => line.startsWith('GLFW Error ')),
+	);
+
+const readChildReport = (stdout) => {
+	const line = stdout
+		.split(/\r?\n/u)
+		.find((currentLine) => currentLine.startsWith(reportPrefix));
+
+	if (!line) {
+		return null;
+	}
+
+	return JSON.parse(line.slice(reportPrefix.length));
+};
+
+const envText = () => {
+	const dyld = process.env['DYLD_LIBRARY_PATH'] || '<unset>';
+	const fallback = process.env['DYLD_FALLBACK_LIBRARY_PATH'] || '<unset>';
+	const software = process.env['LIBGL_ALWAYS_SOFTWARE'] || '<unset>';
+	const driver = process.env['MESA_LOADER_DRIVER_OVERRIDE'] || '<unset>';
+	return `dyld=${dyld} fallback=${fallback} software=${software} driver=${driver}`;
+};
+
 const runParent = () => {
-	log('parent node', process.version, process.platform, process.arch);
+	log('node', process.version, process.platform, process.arch);
+	log('env', envText());
 
 	const results = probes.map((probe) => {
-		log(`child start: ${probe.name}`);
 		const child = spawnSync(process.execPath, [import.meta.filename, childArg], {
+			encoding: 'utf8',
 			env: {
 				...process.env,
 				NODE_3D_MACOS_GL_PROBE: JSON.stringify(probe),
 			},
-			stdio: 'inherit',
 		});
 
 		const isOk = boolFromExitCode(child.status);
-		log(`child ${isOk ? 'ok' : 'failed'}: ${probe.name}`);
+		const stdout = child.stdout || '';
+		const stderr = child.stderr || '';
+		const report = readChildReport(stdout);
+		const glfwErrors = extractGlfwErrors(`${stdout}\n${stderr}`);
+
+		if (isOk && report?.ok) {
+			log(`ok ${probe.name}: version=${report.version} fb=${report.framebufferSize}`);
+		} else {
+			const error = report?.error || child.error?.message || `exit ${child.status}`;
+			const glfwText = glfwErrors.length > 0 ? `; ${glfwErrors.join(' | ')}` : '';
+			log(`fail ${probe.name}: ${error}${glfwText}`);
+		}
+
 		return isOk;
 	});
 
@@ -129,29 +173,8 @@ const readProbe = () => {
 	return JSON.parse(value);
 };
 
-const describeGlfw = (glfw) => {
-	log('node', process.version, process.platform, process.arch);
-	log('glfw version', glfw.getVersionString?.());
-	log('glfw windowHint', typeof glfw.windowHint);
-	log('glfw initHint', typeof glfw.initHint);
-	log('glfw createWindow', typeof glfw.createWindow);
-	log('glfw PLATFORM', glfw.PLATFORM);
-	log('glfw PLATFORM_COCOA', glfw.PLATFORM_COCOA);
-	log('glfw PLATFORM_NULL', glfw.PLATFORM_NULL);
-	log('glfw CONTEXT_CREATION_API', glfw.CONTEXT_CREATION_API);
-	log('glfw NATIVE_CONTEXT_API', glfw.NATIVE_CONTEXT_API);
-	log('glfw EGL_CONTEXT_API', glfw.EGL_CONTEXT_API);
-	log('glfw OSMESA_CONTEXT_API', glfw.OSMESA_CONTEXT_API);
-	log('glfw STENCIL_BITS', glfw.STENCIL_BITS);
-	log('glfw DEPTH_BITS', glfw.DEPTH_BITS);
-	log('glfw SAMPLES', glfw.SAMPLES);
-	log('glfw DONT_CARE', glfw.DONT_CARE);
-	log('DYLD_LIBRARY_PATH', process.env['DYLD_LIBRARY_PATH']);
-	log('DYLD_FALLBACK_LIBRARY_PATH', process.env['DYLD_FALLBACK_LIBRARY_PATH']);
-	log('LIBGL_ALWAYS_SOFTWARE', process.env['LIBGL_ALWAYS_SOFTWARE']);
-	log('MESA_LOADER_DRIVER_OVERRIDE', process.env['MESA_LOADER_DRIVER_OVERRIDE']);
-	log('glfw property names', Object.getOwnPropertyNames(glfw).length);
-	log('glfw enumerable keys', Object.keys(glfw).length);
+const writeReport = (report) => {
+	console.log(`${reportPrefix}${JSON.stringify(report)}`);
 };
 
 const setInitHints = (glfw, probe) => {
@@ -214,19 +237,12 @@ const makeBeforeWindow = (windowKind) => (_window, currentGlfw) => {
 	setWindowHints(currentGlfw, windowKind);
 };
 
-const destroy = (window) => {
+const destroy = (window, logger = log) => {
 	try {
 		window?.destroy();
 	} catch (error) {
-		log('destroy failed', asMessage(error));
+		logger('destroy failed', asMessage(error));
 	}
-};
-
-const printWindow = (window) => {
-	log('window version', window.version);
-	log('window size', JSON.stringify(window.size));
-	log('framebuffer size', JSON.stringify(window.framebufferSize));
-	log('platform context', window.platformContext);
 };
 
 const runChild = async () => {
@@ -237,8 +253,6 @@ const runChild = async () => {
 	globalThis['__isGlfwInited'] = true;
 
 	const { GlfwWindow, glfw } = await import('@node-3d/glfw');
-	describeGlfw(glfw);
-	log(`probe start: ${probe.name}`);
 	initGlfw(glfw, probe);
 
 	let window = null;
@@ -273,14 +287,22 @@ const runChild = async () => {
 			throw new Error(`Unknown probe kind: ${probe.kind}`);
 		}
 
-		log(`probe ok: ${probe.name}`);
-		printWindow(window);
+		writeReport({
+			ok: true,
+			name: probe.name,
+			version: window.version,
+			framebufferSize: window.framebufferSize,
+			platformContext: window.platformContext,
+		});
 	} catch (error) {
-		log(`probe failed: ${probe.name}`);
-		log(asMessage(error));
+		writeReport({
+			ok: false,
+			name: probe.name,
+			error: asMessage(error),
+		});
 		process.exitCode = 1;
 	} finally {
-		destroy(window);
+		destroy(window, () => null);
 		glfw.terminate();
 	}
 };
