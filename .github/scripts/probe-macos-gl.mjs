@@ -99,6 +99,18 @@ const asMessage = (error) => {
 
 const boolFromExitCode = (code) => code === 0;
 
+const exitText = (child) => {
+	if (child.error) {
+		return child.error.message;
+	}
+
+	if (child.signal) {
+		return `signal ${child.signal}`;
+	}
+
+	return `exit ${child.status}`;
+};
+
 const uniq = (values) => [...new Set(values)];
 
 const extractGlfwErrors = (output) =>
@@ -151,7 +163,7 @@ const runParent = () => {
 		if (isOk && report?.ok) {
 			log(`ok ${probe.name}: version=${report.version} fb=${report.framebufferSize}`);
 		} else {
-			const error = report?.error || child.error?.message || `exit ${child.status}`;
+			const error = report?.error || exitText(child);
 			const glfwText = glfwErrors.length > 0 ? `; ${glfwErrors.join(' | ')}` : '';
 			log(`fail ${probe.name}: ${error}${glfwText}`);
 		}

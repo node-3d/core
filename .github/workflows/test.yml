@@ -62,17 +62,6 @@ jobs:
       - name: Install Modules
         run: npm ci
 
-      - name: Install MacOS OpenGL Runtime
-        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
-        run: |
-          brew install mesa
-          mesa_prefix="$(brew --prefix mesa)"
-          echo "DYLD_LIBRARY_PATH=$mesa_prefix/lib:${DYLD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
-          echo "DYLD_FALLBACK_LIBRARY_PATH=$mesa_prefix/lib:${DYLD_FALLBACK_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
-          echo "LIBGL_ALWAYS_SOFTWARE=1" >> "$GITHUB_ENV"
-          echo "MESA_LOADER_DRIVER_OVERRIDE=llvmpipe" >> "$GITHUB_ENV"
-          find "$mesa_prefix/lib" -maxdepth 1 \( -name '*OSMesa*' -o -name '*EGL*' -o -name '*GL*' \) -print
-
       - name: Tests - Linux
         if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         run: xvfb-run --auto-servernum npm run test:ci
@@ -84,19 +73,18 @@ jobs:
           node -e "import('./dist/index.js').then((m) => console.log(Object.keys(m).join(',')))"
           node -e "import('@node-3d/core/testing').then((m) => console.log(Object.keys(m).join(',')))"
 
+      - name: Validate MacOS Imports
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
+        run: |
+          npm run build:ci
+          node -e "import('./dist/index.js').then((m) => console.log(Object.keys(m).join(',')))"
+          node -e "import('@node-3d/core/testing').then((m) => console.log(Object.keys(m).join(',')))"
+
       - uses: ssciwr/setup-mesa-dist-win@v3
         if: matrix.target == 'windows-x64'
 
       - name: Test - Windows
         if: matrix.target == 'windows-x64'
-        run: npm run test:ci
-
-      - name: Probe MacOS OpenGL
-        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
-        run: node .github/scripts/probe-macos-gl.mjs
-
-      - name: Test - MacOS
-        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
         run: npm run test:ci
 
       - name: Check Diff Artifacts
