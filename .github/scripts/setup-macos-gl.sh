@@ -34,6 +34,7 @@ fi
 
 echo "[mac-gl] target_arch=$target_arch"
 echo "[mac-gl] brew=${brew_arch[*]:-native} $brew_bin"
+run_brew untap aws/tap >/dev/null 2>&1 || true
 run_brew --version
 run_brew config
 
