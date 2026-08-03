@@ -43,19 +43,19 @@ const initOpts = {
 	minor: 1,
 };
 const initOptsMacos: TInitOpts = {
-	...initOpts,
+	...initOptsLinux,
 	isVisible: false,
 	onBeforeWindow(_window, currentGlfw) {
 		const windowGlfw = currentGlfw as TGlfw;
 		windowGlfw.windowHint(windowGlfw.CONTEXT_CREATION_API, windowGlfw.EGL_CONTEXT_API);
-		windowGlfw.windowHint(windowGlfw.STENCIL_BITS, 8);
+		windowGlfw.windowHint(windowGlfw.STENCIL_BITS, 0);
 		windowGlfw.windowHint(windowGlfw.DEPTH_BITS, 0);
 		windowGlfw.windowHint(windowGlfw.SAMPLES, 0);
 	},
 };
 
 if (platform === 'darwin') {
-	(macosGlfw ?? glfw).windowHint(glfw.STENCIL_BITS, 8);
+	(macosGlfw ?? glfw).windowHint(glfw.STENCIL_BITS, 0);
 	// this would be nice... - https://github.com/glfw/glfw/pull/2571
 	// glfw.windowHint(glfw.CONTEXT_RENDERER, glfw.SOFTWARE_RENDERER);
 }

@@ -62,34 +62,38 @@ jobs:
       - name: Install Modules
         run: npm ci
 
+      - name: Install Mesa Surfaceless EGL - Mac
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
+        run: bash .github/scripts/setup-macos-gl.sh ${{ matrix.node_arch }}
+
+      - name: Install OpenGL Compatibility Pack - Windows ARM
+        shell: pwsh
+        if: matrix.target == 'windows-arm64'
+        run: |
+          $url = "https://github.com/microsoft/OpenCLOn12/releases/download/v1.2404.1.0/Universal_D3DMappingLayers_1.2404.1.0_arm64.appx"
+          $file = "d3d-mapping-layers-arm64.appx"
+          Invoke-WebRequest -Uri $url -OutFile $file
+          Add-AppxPackage -Path $file
+          Get-AppxPackage Microsoft.D3DMappingLayers | Format-List Name,PackageFullName,Architecture,InstallLocation
+
       - name: Tests - Linux
         if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         run: xvfb-run --auto-servernum npm run test:ci
-
-      - name: Validate Windows ARM64 Imports
-        if: matrix.target == 'windows-arm64'
-        run: |
-          npm run build:ci
-          node -e "import('./dist/index.js').then((m) => console.log(Object.keys(m).join(',')))"
-          node -e "import('@node-3d/core/testing').then((m) => console.log(Object.keys(m).join(',')))"
-
-      - name: Validate MacOS Imports
-        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
-        run: |
-          npm run build:ci
-          node -e "import('./dist/index.js').then((m) => console.log(Object.keys(m).join(',')))"
-          node -e "import('@node-3d/core/testing').then((m) => console.log(Object.keys(m).join(',')))"
 
       - uses: ssciwr/setup-mesa-dist-win@v3
         if: matrix.target == 'windows-x64'
 
       - name: Test - Windows
-        if: matrix.target == 'windows-x64'
+        if: matrix.target == 'windows-x64' || matrix.target == 'windows-arm64'
+        run: npm run test:ci
+
+      - name: Test - Mac
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
         run: npm run test:ci
 
       - name: Check Diff Artifacts
         id: diff-artifacts
-        if: matrix.target != 'darwin-x64' && matrix.target != 'darwin-arm64'
+        if: always()
         run: |
           if [ -d test/__diff__ ] && find test/__diff__ -type f | read -r _; then
             echo "present=true" >> "$GITHUB_OUTPUT"
@@ -98,7 +102,7 @@ jobs:
           fi
 
       - uses: actions/upload-artifact@v7
-        if: steps.diff-artifacts.outputs.present == 'true'
+        if: always() && steps.diff-artifacts.outputs.present == 'true'
         with:
           name: __diff__-${{ matrix.target }}
           path: test/__diff__
