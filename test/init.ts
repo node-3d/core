@@ -79,7 +79,21 @@ const { doc } = inited;
 const window = doc;
 const document = doc;
 
-export const { Image } = core;
+export const {
+	Brush,
+	BrowserDocument,
+	BrowserWindow,
+	Cloud,
+	Drawable,
+	gl,
+	Image,
+	Lines,
+	Points,
+	Rect,
+	Screen,
+	Surface,
+	Tris,
+} = core;
 
 export { doc, window, document };
 

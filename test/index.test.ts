@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import * as three from 'three';
-import {
+import inited, {
 	Brush,
 	BrowserDocument,
 	BrowserWindow,
@@ -14,11 +14,10 @@ import {
 	Screen,
 	Surface,
 	Tris,
-} from '../ts/index.ts';
-import inited from './init.ts';
+} from './init.ts';
 
 type TClassParams = Readonly<{
-	screen: Screen;
+	screen: InstanceType<typeof Screen>;
 }>;
 
 // oxlint-disable-next-line typescript/no-explicit-any
