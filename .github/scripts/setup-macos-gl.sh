@@ -25,7 +25,7 @@ if [[ "$target_arch" == "x64" ]]; then
 	if [[ "${CI:-}" == "true" ]]; then
 		for name in idle3 idle3.14 pip3 pip3.14 pydoc3 pydoc3.14 python3 python3-config python3.14 python3.14-config; do
 			target="/usr/local/bin/$name"
-			if [[ -L "$target" && "$(readlink "$target")" == /Library/Frameworks/Python.framework/Versions/3.14/bin/* ]]; then
+			if [[ -e "$target" || -L "$target" ]]; then
 				rm "$target"
 			fi
 		done
