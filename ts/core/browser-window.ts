@@ -19,9 +19,9 @@ export class BrowserWindow extends GlfwWindow {
 		};
 		this.cancelAnimationFrame = (id) => {
 			this._animationFrameCallbacks.delete(id);
-			if (this._animationFrameCallbacks.size === 0 && this._animationFrameImmediate) {
-				clearImmediate(this._animationFrameImmediate);
-				this._animationFrameImmediate = null;
+			if (this._animationFrameCallbacks.size === 0 && this._animationFrameHandle) {
+				this.cancelFrame(this._animationFrameHandle);
+				this._animationFrameHandle = null;
 				this._nextAnimationFrameId = 1;
 			}
 		};
@@ -34,13 +34,13 @@ export class BrowserWindow extends GlfwWindow {
 	public cancelAnimationFrame: (id: number) => void;
 
 	private _scheduleAnimationFrame(): void {
-		if (this._animationFrameImmediate) {
+		if (this._animationFrameHandle) {
 			return;
 		}
 
-		this._animationFrameImmediate = setImmediate(() => {
-			this._animationFrameImmediate = null;
-			this.drawWindow(this._runAnimationFrameCallbacks);
+		this._animationFrameHandle = this.frame((timestamp) => {
+			this._animationFrameHandle = null;
+			this._runAnimationFrameCallbacks(timestamp);
 		});
 	}
 
@@ -61,7 +61,7 @@ export class BrowserWindow extends GlfwWindow {
 	private _animationFrameCallbacks = new Map<number, TAnimationFrameCallback>();
 
 	// Current scheduled animation frame runner.
-	private _animationFrameImmediate: NodeJS.Immediate | null = null;
+	private _animationFrameHandle: ReturnType<GlfwWindow['frame']> | null = null;
 
 	// Monotonic id used by requestAnimationFrame/cancelAnimationFrame.
 	private _nextAnimationFrameId: number = 1;
