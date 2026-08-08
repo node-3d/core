@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { glfw } from '@node-3d/glfw';
@@ -31,7 +32,7 @@ const { doc, loop } = init({
 });
 addThreeHelpers(THREE);
 
-const icon = new Image('textures/icon.png');
+const icon = new Image(fileURLToPath(new URL('textures/icon.png', import.meta.url)));
 icon.on('load', () => {
 	if (icon.data) {
 		doc.icon = { width: icon.width, height: icon.height, data: icon.data };
@@ -70,7 +71,8 @@ let numColors = 9;
 const rawPalette0 = generatePalette(hueModes[modeHue], numColors);
 let palette = rawPalette0.map((c) => new THREE.Color(...c));
 
-const fragmentShader = readFileSync('post.glsl').toString();
+const fragmentShader = readFileSync(new URL('post.glsl', import.meta.url)).toString();
+const helpTexturePath = fileURLToPath(new URL('textures/help.png', import.meta.url));
 let materialPost = createPostMaterial(
 	THREE,
 	numColors,
@@ -92,7 +94,7 @@ const quadHelp = new THREE.Mesh(
 		depthTest: false,
 		depthWrite: false,
 		transparent: true,
-		map: new THREE.TextureLoader().load('textures/help.png'),
+		map: new THREE.TextureLoader().load(helpTexturePath),
 	}),
 );
 quadHelp.position.set(doc.w * 0.5 - 128, -doc.h * 0.5 + 128, 1);

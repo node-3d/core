@@ -9,6 +9,7 @@ const { doc, loop } = init({
 	autoEsc: true,
 	autoFullscreen: true,
 	title: 'Knot',
+	mode: 'windowed',
 });
 addThreeHelpers(THREE);
 
@@ -37,8 +38,49 @@ const outlineMaterial = new THREE.MeshBasicMaterial({ color: 0, side: THREE.Back
 const outlineMesh = new THREE.Mesh(outlineGeometry, outlineMaterial);
 knotMesh.add(outlineMesh);
 
+let fpsFrames = 0;
+let fpsStartedAt = 0;
+let previousFrameAt = 0;
+let gapTotal = 0;
+let gapMin = Number.POSITIVE_INFINITY;
+let gapMax = 0;
+
+const trackFrame = (now: number): void => {
+	if (!fpsStartedAt) {
+		fpsStartedAt = now;
+		previousFrameAt = now;
+		return;
+	}
+
+	const gap = now - previousFrameAt;
+	previousFrameAt = now;
+	fpsFrames++;
+	gapTotal += gap;
+	gapMin = Math.min(gapMin, gap);
+	gapMax = Math.max(gapMax, gap);
+
+	const elapsed = now - fpsStartedAt;
+	if (elapsed < 1000) {
+		return;
+	}
+
+	console.log('fps', {
+		fps: Math.round((fpsFrames * 1000) / elapsed),
+		avgMs: +(gapTotal / fpsFrames).toFixed(3),
+		minMs: +gapMin.toFixed(3),
+		maxMs: +gapMax.toFixed(3),
+	});
+
+	fpsFrames = 0;
+	fpsStartedAt = now;
+	gapTotal = 0;
+	gapMin = Number.POSITIVE_INFINITY;
+	gapMax = 0;
+};
+
 // Called repeatedly to render new frames
 loop((now) => {
+	trackFrame(now);
 	knotMesh.rotation.x = now * 0.0005;
 	knotMesh.rotation.y = now * 0.001;
 	screen.draw();

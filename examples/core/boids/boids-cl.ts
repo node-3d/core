@@ -17,7 +17,7 @@ console.log('Bird count:', BIRDS);
 const BOUNDS: number = 800;
 const IS_PERF_MODE: boolean = true;
 
-const boidsSrc: string = readFileSync('cl/boids.cl').toString();
+const boidsSrc: string = readFileSync(new URL('cl/boids.cl', import.meta.url)).toString();
 const { screen, doc, gl } = initCommon(IS_PERF_MODE, 'Boids CL');
 const { platform, device } = cl.quickStart(!true);
 

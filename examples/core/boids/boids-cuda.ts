@@ -26,7 +26,7 @@ const BOUNDS: number = 800;
 const IS_PERF_MODE: boolean = true;
 const THREADS_PER_BLOCK: number = 256;
 
-const boidsSrc: string = readFileSync('cuda/boids.cu').toString();
+const boidsSrc: string = readFileSync(new URL('cuda/boids.cu', import.meta.url)).toString();
 const { screen, doc, gl } = initCommon(IS_PERF_MODE, 'Boids CUDA');
 
 if (getDeviceCount() === 0) {

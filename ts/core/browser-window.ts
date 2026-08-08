@@ -19,9 +19,9 @@ export class BrowserWindow extends GlfwWindow {
 		};
 		this.cancelAnimationFrame = (id) => {
 			this._animationFrameCallbacks.delete(id);
-			if (this._animationFrameCallbacks.size === 0 && this._animationFrameHandle) {
-				this.cancelFrame(this._animationFrameHandle);
-				this._animationFrameHandle = null;
+			if (this._animationFrameCallbacks.size === 0 && this._cancelAnimationFrameLoop) {
+				this._cancelAnimationFrameLoop();
+				this._cancelAnimationFrameLoop = null;
 				this._nextAnimationFrameId = 1;
 			}
 		};
@@ -34,14 +34,18 @@ export class BrowserWindow extends GlfwWindow {
 	public cancelAnimationFrame: (id: number) => void;
 
 	private _scheduleAnimationFrame(): void {
-		if (this._animationFrameHandle) {
+		if (this._cancelAnimationFrameLoop) {
 			return;
 		}
 
-		this._animationFrameHandle = this.frame((timestamp) => {
-			this._animationFrameHandle = null;
+		const cancelLoop = this.loop((timestamp) => {
+			cancelLoop();
+			if (this._cancelAnimationFrameLoop === cancelLoop) {
+				this._cancelAnimationFrameLoop = null;
+			}
 			this._runAnimationFrameCallbacks(timestamp);
 		});
+		this._cancelAnimationFrameLoop = cancelLoop;
 	}
 
 	private _runAnimationFrameCallbacks = (timestamp: number): void => {
@@ -60,8 +64,8 @@ export class BrowserWindow extends GlfwWindow {
 	// Queued browser-style animation frame callbacks.
 	private _animationFrameCallbacks = new Map<number, TAnimationFrameCallback>();
 
-	// Current scheduled animation frame runner.
-	private _animationFrameHandle: ReturnType<GlfwWindow['frame']> | null = null;
+	// Cancels the loop waiting for the next actual rendered animation frame.
+	private _cancelAnimationFrameLoop: ReturnType<GlfwWindow['loop']> | null = null;
 
 	// Monotonic id used by requestAnimationFrame/cancelAnimationFrame.
 	private _nextAnimationFrameId: number = 1;

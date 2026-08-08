@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { glfw } from '@node-3d/glfw';
 import * as three from 'three';
 import inited, {
 	Brush,
@@ -170,6 +171,98 @@ describe('Node.js 3D Core', () => {
 	it('exports browser classes', () => {
 		assert.strictEqual(typeof BrowserWindow, 'function');
 		assert.strictEqual(typeof BrowserDocument, 'function');
+	});
+
+	it('handles autoEsc after key event normalization', () => {
+		let didExit = false;
+		const exitOriginal = BrowserWindow.exit;
+		BrowserWindow.exit = (() => {
+			didExit = true;
+		}) as typeof BrowserWindow.exit;
+
+		const doc = new BrowserDocument({ autoEsc: true, width: 32, height: 32 });
+
+		try {
+			doc.emit('keydown', {
+				type: 'keydown',
+				repeat: false,
+				altKey: false,
+				ctrlKey: false,
+				metaKey: false,
+				shiftKey: false,
+				code: null,
+				key: null,
+				which: glfw.KEY_ESCAPE,
+				charCode: 0,
+			});
+
+			assert.strictEqual(didExit, true);
+		} finally {
+			doc.destroy();
+			BrowserWindow.exit = exitOriginal;
+		}
+	});
+
+	it('handles autoFullscreen after key event normalization', () => {
+		let requestedMode: string | null = null;
+		const doc = new BrowserDocument({ autoFullscreen: true, width: 32, height: 32 });
+
+		Object.defineProperty(doc, 'mode', {
+			configurable: true,
+			get: () => requestedMode,
+			set: (mode: string) => {
+				requestedMode = mode;
+			},
+		});
+
+		try {
+			doc.emit('keydown', {
+				type: 'keydown',
+				repeat: false,
+				altKey: false,
+				ctrlKey: true,
+				metaKey: false,
+				shiftKey: false,
+				code: null,
+				key: null,
+				which: glfw.KEY_F,
+				charCode: 0,
+			});
+
+			assert.strictEqual(requestedMode, 'borderless');
+		} finally {
+			doc.destroy();
+		}
+	});
+
+	it('keeps requestAnimationFrame alive across paced native frames', async () => {
+		const doc = new BrowserDocument({ width: 32, height: 32, vsync: true });
+		let frames = 0;
+
+		try {
+			await new Promise<void>((res, rej) => {
+				const timeout = setTimeout(() => {
+					rej(new Error(`Expected 3 animation frames, received ${frames}.`));
+				}, 1000);
+
+				const tick = () => {
+					frames++;
+					if (frames >= 3) {
+						clearTimeout(timeout);
+						res();
+						return;
+					}
+
+					doc.requestAnimationFrame(tick);
+				};
+
+				doc.requestAnimationFrame(tick);
+			});
+
+			assert.strictEqual(frames, 3);
+		} finally {
+			doc.destroy();
+		}
 	});
 
 	describe('Static classes', () => {

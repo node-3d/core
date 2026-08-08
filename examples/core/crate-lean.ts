@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 
 import { Screen, addThreeHelpers, init } from '@node-3d/core';
@@ -12,7 +13,9 @@ const { loop } = init({
 addThreeHelpers(THREE);
 const screen = new Screen({ three: THREE, fov: 70, z: 2 });
 
-const texture = new THREE.TextureLoader().load('three/textures/crate.gif');
+const texture = new THREE.TextureLoader().load(
+	fileURLToPath(new URL('../three/textures/crate.gif', import.meta.url)),
+);
 texture.colorSpace = THREE.SRGBColorSpace;
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshBasicMaterial({ map: texture });

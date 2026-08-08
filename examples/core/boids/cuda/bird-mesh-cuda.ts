@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import { BirdGeometryCuda } from './bird-geometry-cuda.ts';
 import type { TBirdVbos } from './bird-geometry-cuda.ts';
 
-const birdVS: string = readFileSync('cuda/bird-vs.glsl').toString();
-const birdFS: string = readFileSync('cuda/bird-fs.glsl').toString();
+const birdVS: string = readFileSync(new URL('bird-vs.glsl', import.meta.url)).toString();
+const birdFS: string = readFileSync(new URL('bird-fs.glsl', import.meta.url)).toString();
 
 export type TBirdUniforms = {
 	color: THREE.Uniform;

@@ -6,6 +6,20 @@ import type { TCbVoid, TSize, TWindowOpts } from '@node-3d/glfw';
 import { BrowserWindow } from './browser-window.ts';
 
 const logger = getLogger('core');
+const ESC_KEY = 27;
+const F_KEY = 70;
+
+type TShortcutKeyEvent = Readonly<{
+	code: string | null;
+	key: string | null;
+	keyCode?: unknown;
+}>;
+
+const isEscapeKey = (event: TShortcutKeyEvent): boolean =>
+	event.key === 'Escape' || event.code === 'Escape' || event.keyCode === ESC_KEY;
+
+const isFKey = (event: TShortcutKeyEvent): boolean =>
+	event.key === 'f' || event.key === 'F' || event.code === 'KeyF' || event.keyCode === F_KEY;
 
 export type TBrowserDocumentOpts = TWindowOpts &
 	Readonly<
@@ -107,17 +121,25 @@ export class BrowserDocument extends BrowserWindow {
 			this.on('quit', () => BrowserWindow.exit());
 
 			if (opts.autoEsc) {
-				this.on('keydown', (e) => e.keyCode === glfw.KEY_ESCAPE && BrowserWindow.exit());
+				this.on('keydown', (e) => {
+					if (isEscapeKey(e)) {
+						BrowserWindow.exit();
+					}
+				});
 			}
 		}
 
 		if (opts.autoFullscreen) {
 			this.on('keydown', (e) => {
-				if (e.keyCode === glfw.KEY_F && e.ctrlKey && e.shiftKey) {
+				if (!isFKey(e)) {
+					return;
+				}
+
+				if (e.ctrlKey && e.shiftKey) {
 					this.mode = 'windowed';
-				} else if (e.keyCode === glfw.KEY_F && e.ctrlKey && e.altKey) {
+				} else if (e.ctrlKey && e.altKey) {
 					this.mode = 'fullscreen';
-				} else if (e.keyCode === glfw.KEY_F && e.ctrlKey) {
+				} else if (e.ctrlKey) {
 					this.mode = 'borderless';
 				}
 			});

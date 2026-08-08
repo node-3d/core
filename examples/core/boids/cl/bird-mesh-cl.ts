@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import { BirdGeometryCl } from './bird-geometry-cl.ts';
 import type { TBirdVbos } from './bird-geometry-cl.ts';
 
-const birdVS: string = readFileSync('cl/bird-vs.glsl').toString();
-const birdFS: string = readFileSync('cl/bird-fs.glsl').toString();
+const birdVS: string = readFileSync(new URL('bird-vs.glsl', import.meta.url)).toString();
+const birdFS: string = readFileSync(new URL('bird-fs.glsl', import.meta.url)).toString();
 
 export type TBirdUniforms = {
 	color: THREE.Uniform;

@@ -13,8 +13,12 @@ import { BirdMesh } from './gl/bird-mesh.ts';
 const IS_PERF_MODE: boolean = true;
 const { screen, doc } = initCommon(IS_PERF_MODE, 'Boids GL');
 
-const fragmentShaderPosition: string = readFileSync('gl/position-fs.glsl').toString();
-const fragmentShaderVelocity: string = readFileSync('gl/velocity-fs.glsl').toString();
+const fragmentShaderPosition: string = readFileSync(
+	new URL('gl/position-fs.glsl', import.meta.url),
+).toString();
+const fragmentShaderVelocity: string = readFileSync(
+	new URL('gl/velocity-fs.glsl', import.meta.url),
+).toString();
 
 /* Texture size for simulation */
 // const WIDTH: number = 128; // 128^2 = 16384 birds. It ain't much, but it's honest work

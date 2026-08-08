@@ -118,11 +118,45 @@ Three.js setup code each time:
 
 They are intentionally small wrappers around Three.js objects and raw GL resources.
 
+## Frame pacing and vsync
+
+Node3D render callbacks are scheduled through the native GLFW/uv-loop path.
+For ordinary rendering, use `vsync: true` and let Node3D pace frame starts
+against the current monitor refresh rate.
+
+`vsync` and `swapInterval` values follow this policy:
+
+* `false` or `0` renders unpaced with `glfwSwapInterval(0)`.
+* `true` uses the synced path.
+* negative numbers request adaptive sync where available, otherwise normal sync.
+* positive numbers request normal sync.
+
+For synced paths, the native layer gates render callbacks in all window modes:
+windowed, borderless, and fullscreen. Callbacks still receive actual monotonic
+time, so input, animation, physics, and game logic stay connected to real time.
+Applications that need to cap rare long pauses should clamp deltas or use a
+fixed-step accumulator in their own simulation code.
+
+## Examples
+
+Examples are organized by source:
+
+* `examples/core/` contains Node3D-authored examples, diagnostics, stress tests,
+  and shared helpers.
+* `examples/three/` contains examples copied or closely adapted from official
+  Three.js examples.
+* `examples/pixi/` contains examples copied or closely adapted from official
+  Pixi examples.
+
+Future vendor examples should use their own directory, such as
+`examples/babylonjs/`, while Node3D-specific probes stay under `examples/core/`.
+
 ## Example
 
-(As in [crate-lean.ts](examples/crate-lean.ts)):
+(As in [crate-lean.ts](examples/core/crate-lean.ts)):
 
 ```javascript
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 
 import { Screen, addThreeHelpers, init } from '@node-3d/core';
@@ -133,7 +167,9 @@ const { loop } = init({
 addThreeHelpers(THREE);
 const screen = new Screen({ three: THREE, fov: 70, z: 2 });
 
-const texture = new THREE.TextureLoader().load('three/textures/crate.gif');
+const texture = new THREE.TextureLoader().load(
+	fileURLToPath(new URL('../three/textures/crate.gif', import.meta.url)),
+);
 texture.colorSpace = THREE.SRGBColorSpace;
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshBasicMaterial({ map: texture });
@@ -166,7 +202,7 @@ Example Notes:
 1. This is real **native OpenGL**, and you have direct access to GL resource IDs. This may be
 	useful for resource sharing and compute interop:
 	* [CUDA-GL interop](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__OPENGL.html).
-	* [OpenCL-GL interop](https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueAcquireGLObjects.html) - see [example](examples/boids).
+	* [OpenCL-GL interop](https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueAcquireGLObjects.html) - see [example](examples/core/boids).
 	* [Context sharing](https://www.glfw.org/docs/latest/context_guide.html#context_sharing).
 1. The flag `isGles3` lets you use a **GL ES 3** preset, which is closest to "real" WebGL.
 	If set to `false`, WebGL stuff (such as three.js) will still work, but now with some hacks.

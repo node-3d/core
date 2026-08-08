@@ -1,28 +1,26 @@
 // Based on https://threejs.org/examples/?q=postprocess#webgl_postprocessing_advanced
 
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-import { Image, addThreeHelpers, gl, init } from '@node-3d/core';
 import {
+	BleachBypassShader,
 	BloomPass,
 	ClearMaskPass,
+	ColorifyShader,
 	DotScreenPass,
 	EffectComposer,
 	FilmPass,
+	GLTFLoader,
+	HorizontalBlurShader,
 	MaskPass,
 	RenderPass,
+	SepiaShader,
 	ShaderPass,
 	TexturePass,
-} from './postprocessing.ts';
-import {
-	BleachBypassShader,
-	ColorifyShader,
-	HorizontalBlurShader,
-	SepiaShader,
 	VerticalBlurShader,
 	VignetteShader,
-} from './post-shaders.ts';
+} from 'three/examples/jsm/Addons.js';
+
+import { Image, addThreeHelpers, gl, init } from '@node-3d/core';
 
 const IS_PERF_MODE = true;
 

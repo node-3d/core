@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import * as PIXI from 'pixi.js';
 import { init } from '@node-3d/core';
 
@@ -70,16 +71,16 @@ const container = new PIXI.Container();
 
 app.stage.addChild(container);
 
-// Create a new texture
+// Create a new texture.
 await PIXI.Assets.init({
 	skipDetections: true,
 	texturePreference: {
 		format: ['png'],
 	},
 });
-const texture = await PIXI.Assets.load('https://pixijs.io/examples/examples/assets/bunny.png');
+const texture = await PIXI.Assets.load(fileURLToPath(new URL('assets/bunny.png', import.meta.url)));
 
-// Create a 5x5 grid of bunnies
+// Create a 5x5 grid of bunnies.
 for (let i = 0; i < 25; i++) {
 	const bunny = new PIXI.Sprite(texture);
 	bunny.anchor.set(0.5);
@@ -92,7 +93,7 @@ for (let i = 0; i < 25; i++) {
 container.x = app.screen.width / 2;
 container.y = app.screen.height / 2;
 
-// Center bunny sprite in local container coordinates
+// Center bunny sprite in local container coordinates.
 container.pivot.x = container.width / 2;
 container.pivot.y = container.height / 2;
 

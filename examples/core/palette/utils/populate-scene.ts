@@ -34,7 +34,7 @@ const populateScene = (scene: THREE.Scene, cb: (mesh: THREE.Object3D) => void): 
 	(async () => {
 		const THREE = await import('three');
 		const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-		const { DRACOLoader } = await import('./DRACOLoader.ts');
+		const { DRACOLoader } = await import('./draco-loader.ts');
 
 		const ambientLight = new THREE.AmbientLight(0xeeffee, 0.3);
 		scene.add(ambientLight);
@@ -69,7 +69,7 @@ const populateScene = (scene: THREE.Scene, cb: (mesh: THREE.Object3D) => void): 
 		dracoLoader.setDecoderPath(
 			path.resolve(
 				import.meta.dirname,
-				'../../../node_modules/three/examples/jsm/libs/draco/gltf/',
+				'../../../../node_modules/three/examples/jsm/libs/draco/gltf/',
 			),
 		);
 

@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { BirdGeometry } from './bird-geometry.ts';
 
-const birdVS: string = readFileSync('gl/bird-vs.glsl').toString();
-const birdFS: string = readFileSync('gl/bird-fs.glsl').toString();
+const birdVS: string = readFileSync(new URL('bird-vs.glsl', import.meta.url)).toString();
+const birdFS: string = readFileSync(new URL('bird-fs.glsl', import.meta.url)).toString();
 
 export type TBirdUniforms = {
 	texturePosition: THREE.Uniform;
