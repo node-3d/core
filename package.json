@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "@node-3d/core",
-	"version": "6.2.0",
+	"version": "6.3.0",
 	"description": "An extensible Node3D core for desktop applications",
 	"license": "MIT",
 	"main": "dist/index.js",
@@ -45,7 +45,7 @@
 	},
 	"dependencies": {
 		"@node-3d/addon-tools": "~10.0.1",
-		"@node-3d/glfw": "~7.2.0",
+		"@node-3d/glfw": "~7.3.0",
 		"@node-3d/image": "~6.0.0",
 		"@node-3d/webgl": "~6.0.0"
 	},
