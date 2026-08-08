@@ -1,22 +1,38 @@
+// oxlint-disable node/no-process-env
 import { platform } from 'node:process';
 import * as three from 'three';
 import type { TGlfw, TInitOpts } from '../ts/types.ts';
 
-const bootstrapMacosGlfw = async (): Promise<TGlfw | null> => {
-	if (platform !== 'darwin') {
+const isCi = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const shouldUseHeadlessGlfw = platform === 'darwin' || (platform === 'linux' && isCi);
+
+const applyHeadlessWindowHints = (currentGlfw: TGlfw): void => {
+	currentGlfw.windowHint(currentGlfw.VISIBLE, currentGlfw.FALSE);
+	currentGlfw.windowHint(currentGlfw.CONTEXT_CREATION_API, currentGlfw.EGL_CONTEXT_API);
+	currentGlfw.windowHint(currentGlfw.OPENGL_PROFILE, currentGlfw.OPENGL_ANY_PROFILE);
+	currentGlfw.windowHint(currentGlfw.CONTEXT_VERSION_MAJOR, 3);
+	currentGlfw.windowHint(currentGlfw.CONTEXT_VERSION_MINOR, 2);
+	currentGlfw.windowHint(currentGlfw.CLIENT_API, currentGlfw.OPENGL_ES_API);
+	currentGlfw.windowHint(currentGlfw.STENCIL_BITS, 0);
+	currentGlfw.windowHint(currentGlfw.DEPTH_BITS, 0);
+	currentGlfw.windowHint(currentGlfw.SAMPLES, 0);
+};
+
+const bootstrapHeadlessGlfw = async (): Promise<TGlfw | null> => {
+	if (!shouldUseHeadlessGlfw) {
 		return null;
 	}
 
 	const nodeGlobal = globalThis as unknown as Record<string, unknown>;
 
-	// @node-3d/glfw normally initializes on import. The macOS CI path needs
-	// glfwInitHint before glfwInit so it can use the Null platform.
+	// @node-3d/glfw normally initializes on import. CI headless tests need
+	// glfwInitHint before glfwInit so they can use the Null platform.
 	nodeGlobal['__isGlfwInited'] = true;
 	const { glfw: bootstrappedGlfw } = await import('@node-3d/glfw');
 	bootstrappedGlfw.initHint(bootstrappedGlfw.PLATFORM, bootstrappedGlfw.PLATFORM_NULL);
 
 	if (!bootstrappedGlfw.init()) {
-		throw new Error('Failed to initialize GLFW for macOS tests');
+		throw new Error('Failed to initialize GLFW for headless tests');
 	}
 
 	bootstrappedGlfw.defaultWindowHints();
@@ -25,7 +41,7 @@ const bootstrapMacosGlfw = async (): Promise<TGlfw | null> => {
 	return bootstrappedGlfw;
 };
 
-const macosGlfw = await bootstrapMacosGlfw();
+const headlessGlfw = await bootstrapHeadlessGlfw();
 const core = await import('../ts/index.ts');
 const { init, addThreeHelpers, glfw } = core;
 
@@ -42,31 +58,27 @@ const initOpts = {
 	major: 2,
 	minor: 1,
 };
-const initOptsMacos: TInitOpts = {
+const initOptsHeadless: TInitOpts = {
 	...initOptsLinux,
 	isVisible: false,
 	onBeforeWindow(_window, currentGlfw) {
-		const windowGlfw = currentGlfw as TGlfw;
-		windowGlfw.windowHint(windowGlfw.CONTEXT_CREATION_API, windowGlfw.EGL_CONTEXT_API);
-		windowGlfw.windowHint(windowGlfw.STENCIL_BITS, 0);
-		windowGlfw.windowHint(windowGlfw.DEPTH_BITS, 0);
-		windowGlfw.windowHint(windowGlfw.SAMPLES, 0);
+		applyHeadlessWindowHints(currentGlfw as TGlfw);
 	},
 };
 
-if (platform === 'darwin') {
-	(macosGlfw ?? glfw).windowHint(glfw.STENCIL_BITS, 0);
+if (shouldUseHeadlessGlfw) {
+	(headlessGlfw ?? glfw).windowHint(glfw.STENCIL_BITS, 0);
 	// this would be nice... - https://github.com/glfw/glfw/pull/2571
 	// glfw.windowHint(glfw.CONTEXT_RENDERER, glfw.SOFTWARE_RENDERER);
 }
 
 const getInitOpts = (): TInitOpts => {
-	if (platform === 'linux') {
-		return initOptsLinux;
+	if (shouldUseHeadlessGlfw) {
+		return initOptsHeadless;
 	}
 
-	if (platform === 'darwin') {
-		return initOptsMacos;
+	if (platform === 'linux') {
+		return initOptsLinux;
 	}
 
 	return initOpts;
@@ -95,6 +107,23 @@ export const {
 	Tris,
 } = core;
 
-export { doc, window, document };
+export { doc, window, document, glfw };
+
+const getTestDocumentOpts = (opts: TInitOpts = {}): TInitOpts => {
+	if (!shouldUseHeadlessGlfw) {
+		return opts;
+	}
+
+	return {
+		...opts,
+		onBeforeWindow(windowCurrent, currentGlfw) {
+			applyHeadlessWindowHints(currentGlfw as TGlfw);
+			opts.onBeforeWindow?.(windowCurrent, currentGlfw);
+		},
+	};
+};
+
+export const createTestDocument = (opts: TInitOpts = {}): InstanceType<typeof BrowserDocument> =>
+	new BrowserDocument(getTestDocumentOpts(opts));
 
 export default inited;

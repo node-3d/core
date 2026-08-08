@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { glfw } from '@node-3d/glfw';
 import * as three from 'three';
 import inited, {
 	Brush,
@@ -9,12 +8,14 @@ import inited, {
 	Cloud,
 	Drawable,
 	gl,
+	glfw,
 	Lines,
 	Points,
 	Rect,
 	Screen,
 	Surface,
 	Tris,
+	createTestDocument,
 } from './init.ts';
 
 type TClassParams = Readonly<{
@@ -180,7 +181,7 @@ describe('Node.js 3D Core', () => {
 			didExit = true;
 		}) as typeof BrowserWindow.exit;
 
-		const doc = new BrowserDocument({ autoEsc: true, width: 32, height: 32 });
+		const doc = createTestDocument({ autoEsc: true, width: 32, height: 32 });
 
 		try {
 			doc.emit('keydown', {
@@ -205,7 +206,7 @@ describe('Node.js 3D Core', () => {
 
 	it('handles autoFullscreen after key event normalization', () => {
 		let requestedMode: string | null = null;
-		const doc = new BrowserDocument({ autoFullscreen: true, width: 32, height: 32 });
+		const doc = createTestDocument({ autoFullscreen: true, width: 32, height: 32 });
 
 		Object.defineProperty(doc, 'mode', {
 			configurable: true,
@@ -236,7 +237,7 @@ describe('Node.js 3D Core', () => {
 	});
 
 	it('keeps requestAnimationFrame alive across paced native frames', async () => {
-		const doc = new BrowserDocument({ width: 32, height: 32, vsync: true });
+		const doc = createTestDocument({ width: 32, height: 32, vsync: true });
 		let frames = 0;
 
 		try {
