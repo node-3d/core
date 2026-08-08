@@ -1,10 +1,8 @@
-// oxlint-disable node/no-process-env
 import { platform } from 'node:process';
 import * as three from 'three';
 import type { TGlfw, TInitOpts } from '../ts/types.ts';
 
-const isCi = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
-const shouldUseHeadlessGlfw = platform === 'darwin' || (platform === 'linux' && isCi);
+const shouldUseHeadlessGlfw = platform === 'darwin';
 
 const applyHeadlessWindowHints = (currentGlfw: TGlfw): void => {
 	currentGlfw.windowHint(currentGlfw.VISIBLE, currentGlfw.FALSE);
