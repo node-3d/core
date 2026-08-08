@@ -2,7 +2,7 @@
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "@node-3d/core",
 	"version": "6.3.0",
-	"description": "An extensible Node3D core for desktop applications",
+	"description": "Run WebGL, Three.js, and multimedia workloads on Node.js",
 	"license": "MIT",
 	"main": "dist/index.js",
 	"keywords": [

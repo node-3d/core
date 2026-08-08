@@ -164,7 +164,7 @@ const staticClasses: TStaticClasses = {
 	},
 };
 
-describe('Node.js 3D Core', () => {
+describe('Node3D Core', () => {
 	it('exports an object', () => {
 		assert.strictEqual(typeof inited, 'object');
 	});
