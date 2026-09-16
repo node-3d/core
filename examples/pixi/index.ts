@@ -78,7 +78,9 @@ await PIXI.Assets.init({
 		format: ['png'],
 	},
 });
-const texture = await PIXI.Assets.load(fileURLToPath(new URL('assets/bunny.png', import.meta.url)));
+const texture: PIXI.Texture = await PIXI.Assets.load(
+	fileURLToPath(new URL('assets/bunny.png', import.meta.url)),
+);
 
 // Create a 5x5 grid of bunnies.
 for (let i = 0; i < 25; i++) {

@@ -220,14 +220,14 @@ export const matchScreenshot = async (
 		const path = makePathExport(name, { screenshotsDir });
 
 		// oxlint-disable-next-line node/no-process-env
-		const isCi = !!process.env['CI'];
+		const isCi = !!process.env.CI;
 		const hasFile = await pathExists(path);
 
 		if (!hasFile && !isCi) {
 			return await makeScreenshot(name, opts);
 		}
 
-		return compareScreenshot(name, opts);
+		return await compareScreenshot(name, opts);
 	} catch (error) {
 		normalizeOptions(opts).report?.('error', 'Unable to match screenshot.', error);
 		return false;

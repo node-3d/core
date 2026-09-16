@@ -16,13 +16,7 @@ const createVbo = (count: number, elements: number): TVboInfo => {
 	const { gl } = node3d;
 	const array = new Float32Array(count * elements);
 	const vbo = gl.createBuffer();
-	const attribute = new THREE.GLBufferAttribute(
-		vbo as unknown as globalThis.WebGLBuffer,
-		gl.FLOAT,
-		elements,
-		4,
-		count,
-	);
+	const attribute = new THREE.GLBufferAttribute(vbo, gl.FLOAT, elements, 4, count);
 
 	// HACK: instancing support
 	const iattr = attribute as unknown as THREE.InstancedBufferAttribute;

@@ -39,11 +39,9 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 	const { isWebGL2, isGles3, isVisible, ...optsDoc } = opts;
 
 	const imagePrototype = Image.prototype as TImageConstructor['prototype'];
-	if (!imagePrototype.fillRect) {
-		imagePrototype.fillRect = () => {
+	imagePrototype.fillRect ??= () => {
 			/* nop */
-		};
-	}
+	};
 
 	if (isWebGL2) {
 		gl.useWebGL2();
@@ -87,13 +85,9 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 	const doc = new BrowserDocument({ ...optsDoc, onBeforeWindow }) as unknown as TDocument;
 	const nodeGlobal = globalThis as unknown as TNode3DGlobal;
 
-	if (!nodeGlobal.self) {
-		nodeGlobal.self = nodeGlobal;
-	}
+	nodeGlobal.self ??= nodeGlobal;
 
-	if (!nodeGlobal.globalThis) {
-		nodeGlobal.globalThis = nodeGlobal;
-	}
+	nodeGlobal.globalThis ??= nodeGlobal;
 
 	nodeGlobal.document = doc;
 	nodeGlobal.window = doc;
@@ -104,21 +98,15 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 	nodeGlobal.requestAnimationFrame = doc.requestAnimationFrame;
 	nodeGlobal.cancelAnimationFrame = doc.cancelAnimationFrame;
 
-	if (!nodeGlobal.location) {
-		nodeGlobal.location = location;
-	}
+	nodeGlobal.location ??= location;
 	doc.location = nodeGlobal.location;
 
-	if (!nodeGlobal.navigator) {
-		nodeGlobal.navigator = navigator;
-	}
+	nodeGlobal.navigator ??= navigator;
 
-	if (!nodeGlobal.ResizeObserver) {
-		nodeGlobal.ResizeObserver = ResizeObserver;
-	}
+	nodeGlobal.ResizeObserver ??= ResizeObserver;
 
 	nodeGlobal.WebVRManager = WebVRManager;
-	nodeGlobal.Image = Image as TImageConstructor;
+	nodeGlobal.Image = Image;
 	// oxlint-disable-next-line no-underscore-dangle
 	nodeGlobal._gl = gl;
 

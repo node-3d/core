@@ -33,8 +33,8 @@ export class Vec2 extends Array<number> {
 		}
 
 		if (Array.isArray(x) || x instanceof Vec2) {
-			this.x = x[0];
-			this.y = x[1];
+			this.x = x[0] ?? 0;
+			this.y = x[1] ?? 0;
 			return;
 		}
 
@@ -45,14 +45,14 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get x(): number {
-		return this[0];
+		return this[0] ?? 0;
 	}
 	public set x(value: number) {
 		this[0] = value;
 	}
 
 	public get y(): number {
-		return this[1];
+		return this[1] ?? 0;
 	}
 	public set y(value: number) {
 		this[1] = value;
@@ -71,7 +71,7 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get yx(): Vec2 {
-		return new Vec2([this[1], this[0]]);
+		return new Vec2([this[1] ?? 0, this[0] ?? 0]);
 	}
 	public set yx(value: TVec2Source) {
 		this[0] = value[1];
@@ -79,8 +79,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public plused(other: TVec2Source): this {
-		this[0] += other[0];
-		this[1] += other[1];
+		this[0] = (this[0] ?? 0) + other[0];
+		this[1] = (this[1] ?? 0) + other[1];
 		return this;
 	}
 	public plus(other: TVec2Source): this {
@@ -94,8 +94,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public minused(other: TVec2Source): this {
-		this[0] -= other[0];
-		this[1] -= other[1];
+		this[0] = (this[0] ?? 0) - other[0];
+		this[1] = (this[1] ?? 0) - other[1];
 		return this;
 	}
 	public minus(other: TVec2Source): this {
@@ -122,8 +122,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public muled(other: TVec2Source): this {
-		this[0] *= other[0];
-		this[1] *= other[1];
+		this[0] = (this[0] ?? 0) * other[0];
+		this[1] = (this[1] ?? 0) * other[1];
 		return this;
 	}
 	public mul(other: TVec2Source): this {
@@ -143,8 +143,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public dived(other: TVec2Source): this {
-		this[0] /= other[0];
-		this[1] /= other[1];
+		this[0] = (this[0] ?? 0) / other[0];
+		this[1] = (this[1] ?? 0) / other[1];
 		return this;
 	}
 	public div(other: TVec2Source): this {
@@ -158,8 +158,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public maxed(other: TVec2Source): this {
-		this[0] = Math.max(this[0], other[0]);
-		this[1] = Math.max(this[1], other[1]);
+		this[0] = Math.max(this[0] ?? 0, other[0]);
+		this[1] = Math.max(this[1] ?? 0, other[1]);
 		return this;
 	}
 	public max(other: TVec2Source): this {
@@ -167,8 +167,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public mined(other: TVec2Source): this {
-		this[0] = Math.min(this[0], other[0]);
-		this[1] = Math.min(this[1], other[1]);
+		this[0] = Math.min(this[0] ?? 0, other[0]);
+		this[1] = Math.min(this[1] ?? 0, other[1]);
 		return this;
 	}
 	public min(other: TVec2Source): this {
@@ -176,8 +176,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get neged(): this {
-		this[0] = -this[0];
-		this[1] = -this[1];
+		this[0] = -(this[0] ?? 0);
+		this[1] = -(this[1] ?? 0);
 		return this;
 	}
 	public get neg(): this {
@@ -185,8 +185,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public scaled(scalar: number): this {
-		this[0] *= scalar;
-		this[1] *= scalar;
+		this[0] = (this[0] ?? 0) * scalar;
+		this[1] = (this[1] ?? 0) * scalar;
 		return this;
 	}
 	public scale(scalar: number): this {
@@ -194,8 +194,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get rounded(): this {
-		this[0] = Math.round(this[0]);
-		this[1] = Math.round(this[1]);
+		this[0] = Math.round(this[0] ?? 0);
+		this[1] = Math.round(this[1] ?? 0);
 		return this;
 	}
 	public get round(): this {
@@ -203,8 +203,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get floored(): this {
-		this[0] = Math.floor(this[0]);
-		this[1] = Math.floor(this[1]);
+		this[0] = Math.floor(this[0] ?? 0);
+		this[1] = Math.floor(this[1] ?? 0);
 		return this;
 	}
 	public get floor(): this {
@@ -212,8 +212,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get ceiled(): this {
-		this[0] = Math.ceil(this[0]);
-		this[1] = Math.ceil(this[1]);
+		this[0] = Math.ceil(this[0] ?? 0);
+		this[1] = Math.ceil(this[1] ?? 0);
 		return this;
 	}
 	public get ceil(): this {
@@ -221,8 +221,8 @@ export class Vec2 extends Array<number> {
 	}
 
 	public fracted(scalar: number): this {
-		this[0] /= scalar;
-		this[1] /= scalar;
+		this[0] = (this[0] ?? 0) / scalar;
+		this[1] = (this[1] ?? 0) / scalar;
 		return this;
 	}
 	public fract(scalar: number): this {
@@ -233,11 +233,11 @@ export class Vec2 extends Array<number> {
 		return this[0] === 0 && this[1] === 0;
 	}
 	public cmp(cb: TVecCompare): boolean {
-		return cb(this[0], 0) && cb(this[1], 1);
+		return cb(this[0] ?? 0, 0) && cb(this[1] ?? 0, 1);
 	}
 
 	public dot(other: TVec2Source): number {
-		return this[0] * other[0] + this[1] * other[1];
+		return (this[0] ?? 0) * other[0] + (this[1] ?? 0) * other[1];
 	}
 
 	public get sqLen(): number {
@@ -253,7 +253,7 @@ export class Vec2 extends Array<number> {
 	public get len(): number {
 		return Math.sqrt(this.sqLen);
 	}
-	public get length(): number {
+	public override get length(): number {
 		return this.len;
 	}
 	public get size(): number {
@@ -283,12 +283,12 @@ export class Vec2 extends Array<number> {
 		return this;
 	}
 
-	public toString(): string {
+	public override toString(): string {
 		return `Vec2(${this[0]}, ${this[1]})`;
 	}
 
 	public get ortho(): Vec2 {
-		return new Vec2(this[1], -this[0]);
+		return new Vec2(this[1], -(this[0] ?? 0));
 	}
 	public get orthoCw(): Vec2 {
 		return this.ortho;
@@ -298,14 +298,14 @@ export class Vec2 extends Array<number> {
 	}
 
 	public get orthoCcw(): Vec2 {
-		return new Vec2(-this[1], this[0]);
+		return new Vec2(-(this[1] ?? 0), this[0]);
 	}
 	public get orthoCounterClockwise(): Vec2 {
 		return this.orthoCcw;
 	}
 
 	public crossLen(other: TVec2Source): number {
-		return this[0] * other[1] - this[1] * other[0];
+		return (this[0] ?? 0) * other[1] - (this[1] ?? 0) * other[0];
 	}
 	public crossLength(other: TVec2Source): number {
 		return this.crossLen(other);
@@ -316,8 +316,8 @@ export class Vec2 extends Array<number> {
 			return this;
 		}
 
-		const x = this[0];
-		const y = this[1];
+		const x = this[0] ?? 0;
+		const y = this[1] ?? 0;
 		const c = Math.cos(angle);
 		const s = Math.sin(angle);
 		this[0] = c * x - s * y;

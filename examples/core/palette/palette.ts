@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { glfw } from '@node-3d/glfw';
+import type { TKeyEvent } from '@node-3d/glfw';
 import { Image } from '@node-3d/image';
 
 import { Screen, addThreeHelpers, init } from '@node-3d/core';
@@ -19,8 +19,6 @@ import type { THueMode } from './utils/index.ts';
 const IS_PERF_MODE = !true;
 
 const hueModes: THueMode[] = ['monochromatic', 'analagous', 'complementary', 'triadic', 'tetradic'];
-
-const extraCodes = (glfw as unknown as { extraCodes: Record<number, number> }).extraCodes;
 
 const { doc, loop } = init({
 	isGles3: true,
@@ -68,7 +66,7 @@ let modeGrayscale = 0;
 let modeHue = 0;
 let numColors = 9;
 
-const rawPalette0 = generatePalette(hueModes[modeHue], numColors);
+const rawPalette0 = generatePalette(hueModes[modeHue] ?? 'monochromatic', numColors);
 let palette = rawPalette0.map((c) => new THREE.Color(...c));
 
 const fragmentShader = readFileSync(new URL('post.glsl', import.meta.url)).toString();
@@ -104,17 +102,20 @@ let colorQuads = createColorQuads(THREE, scenePost, palette, isSwap);
 
 const setPalette = (newValue: THREE.Color[]): void => {
 	palette = newValue;
-	materialPost.uniforms.colors.value = palette;
+	if (materialPost.uniforms.colors) {
+		materialPost.uniforms.colors.value = palette;
+	}
 	if (palette.length === colorQuads.length) {
 		for (let i = 0; i < palette.length; i++) {
 			const color = palette[i];
-			colorQuads[i].material.uniforms.color.value = color;
+			const colorUniform = colorQuads[i]?.material.uniforms.color;
+			if (colorUniform) {
+				colorUniform.value = color;
+			}
 		}
 	} else {
-		if (colorQuads) {
-			for (const q of colorQuads) {
-				scenePost.remove(q);
-			}
+		for (const q of colorQuads) {
+			scenePost.remove(q);
 		}
 		colorQuads = createColorQuads(THREE, scenePost, palette, isSwap);
 	}
@@ -133,7 +134,9 @@ const setModeGrayscale = (newValue: number): void => {
 		console.log('Grayscale mode: OFF.');
 	}
 
-	materialPost.uniforms.modeGrayscale.value = modeGrayscale;
+	if (materialPost.uniforms.modeGrayscale) {
+		materialPost.uniforms.modeGrayscale.value = modeGrayscale;
+	}
 };
 
 const setIsSwap = (newValue: boolean): void => {
@@ -145,14 +148,19 @@ const setIsSwap = (newValue: boolean): void => {
 		setModeGrayscale(0);
 	}
 
-	materialPost.uniforms.isSwap.value = isSwap;
+	if (materialPost.uniforms.isSwap) {
+		materialPost.uniforms.isSwap.value = isSwap;
+	}
 	for (let i = 0; i < palette.length; i++) {
-		colorQuads[i].visible = isSwap;
+		const quad = colorQuads[i];
+		if (quad) {
+			quad.visible = isSwap;
+		}
 	}
 };
 
 const randomizePalette = (): void => {
-	const rawPalette = generatePalette(hueModes[modeHue], numColors);
+	const rawPalette = generatePalette(hueModes[modeHue] ?? 'monochromatic', numColors);
 	const colorPalette = rawPalette.map((c) => new THREE.Color(...c));
 	setPalette(colorPalette);
 };
@@ -168,7 +176,7 @@ const setNumColors = (newValue: number): void => {
 	}
 	numColors = newValue;
 
-	const rawPalette = generatePalette(hueModes[modeHue], numColors);
+	const rawPalette = generatePalette(hueModes[modeHue] ?? 'monochromatic', numColors);
 	const colorPalette = rawPalette.map((c) => new THREE.Color(...c));
 	materialPost = createPostMaterial(
 		THREE,
@@ -178,7 +186,9 @@ const setNumColors = (newValue: number): void => {
 		colorPalette,
 		fragmentShader,
 	);
-	materialPost.uniforms.t.value = rt?.texture ?? null;
+	if (materialPost.uniforms.t) {
+		materialPost.uniforms.t.value = rt?.texture ?? null;
+	}
 
 	scenePost.remove(quadPost);
 	quadPost = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), materialPost);
@@ -187,33 +197,32 @@ const setNumColors = (newValue: number): void => {
 	randomizePalette();
 };
 
-doc.on('keydown', (event) => {
-	const e = event as { keyCode: number };
-	if (e.keyCode === glfw.KEY_P) {
+doc.on('keydown', (e: TKeyEvent) => {
+	if (e.code === 'KeyP') {
 		randomizePalette();
 		return;
 	}
-	if (e.keyCode === glfw.KEY_M) {
+	if (e.code === 'KeyM') {
 		setModeHue((modeHue + 1) % hueModes.length);
 		return;
 	}
-	if (e.keyCode === glfw.KEY_S) {
+	if (e.code === 'KeyS') {
 		setIsSwap(!isSwap);
 		return;
 	}
-	if (e.keyCode === glfw.KEY_G) {
+	if (e.code === 'KeyG') {
 		setModeGrayscale((modeGrayscale + 1) % 4);
 		return;
 	}
-	if (e.keyCode === extraCodes[glfw.KEY_EQUAL]) {
+	if (e.code === 'Equal') {
 		setNumColors(Math.min(16, numColors + 1));
 		return;
 	}
-	if (e.keyCode === extraCodes[glfw.KEY_MINUS]) {
+	if (e.code === 'Minus') {
 		setNumColors(Math.max(2, numColors - 1));
 		return;
 	}
-	if (e.keyCode === glfw.KEY_H || e.keyCode === extraCodes[glfw.KEY_F1]) {
+	if (e.code === 'KeyH' || e.code === 'F1') {
 		quadHelp.visible = !quadHelp.visible;
 	}
 });

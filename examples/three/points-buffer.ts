@@ -18,7 +18,7 @@ const scene = new three.Scene();
 const screen = new Screen({ three, camera, scene });
 type TDocumentEventCallback = Parameters<typeof screen.document.addEventListener>[1];
 
-const REAL_SIZE = 20000;
+const REAL_SIZE = 20_000;
 
 let particles: three.Points | null = null;
 const materials: three.PointsMaterial[] = [];
@@ -56,8 +56,8 @@ const onDocumentTouchStart: TDocumentEventCallback = (event) => {
 	const touchEvent = event as TTouchLikeEvent;
 	if (touchEvent.touches?.length === 1) {
 		touchEvent.preventDefault?.();
-		mouseX = touchEvent.touches[0].pageX - windowHalfX;
-		mouseY = touchEvent.touches[0].pageY - windowHalfY;
+		mouseX = (touchEvent.touches[0]?.pageX ?? 0) - windowHalfX;
+		mouseY = (touchEvent.touches[0]?.pageY ?? 0) - windowHalfY;
 	}
 };
 
@@ -65,8 +65,8 @@ const onDocumentTouchMove: TDocumentEventCallback = (event) => {
 	const touchEvent = event as TTouchLikeEvent;
 	if (touchEvent.touches?.length === 1) {
 		touchEvent.preventDefault?.();
-		mouseX = touchEvent.touches[0].pageX - windowHalfX;
-		mouseY = touchEvent.touches[0].pageY - windowHalfY;
+		mouseX = (touchEvent.touches[0]?.pageX ?? 0) - windowHalfX;
+		mouseY = (touchEvent.touches[0]?.pageY ?? 0) - windowHalfY;
 	}
 };
 
@@ -123,12 +123,10 @@ loop(() => {
 	for (i = 0; i < materials.length; i++) {
 		color = [1, 1, 0.5];
 		h = ((360 * (color[0] + time)) % 360) / 360;
-		materials[i].color.setHSL(h, color[1], color[2]);
+		materials[i]?.color.setHSL(h, color[1], color[2]);
 	}
 
-	if (cloud) {
-		cloud.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
-	}
+	cloud.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
 
 	screen.renderer.render(scene, camera);
 });

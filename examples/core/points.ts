@@ -1,6 +1,7 @@
 import * as three from 'three';
 
 import { Points, Screen, gl, init } from '@node-3d/core';
+import type { TMouseEvent } from '@node-3d/glfw';
 
 const { loop } = init({
 	isGles3: true,
@@ -16,7 +17,7 @@ loop(() => screen.draw());
 
 screen.camera.position.z = 200;
 
-const VBO_SIZE = 10000;
+const VBO_SIZE = 10_000;
 
 const vertices = [];
 const colors = [];
@@ -53,7 +54,7 @@ screen.on('mouseup', () => {
 	isMoving = false;
 });
 
-screen.on('mousemove', (e) => {
+screen.on('mousemove', (e: TMouseEvent) => {
 	const dx = mouse.x - e.x;
 	const dy = mouse.y - e.y;
 

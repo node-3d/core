@@ -16,7 +16,7 @@ export class Brush extends Drawable {
 	public constructor(opts: TBrushOpts) {
 		super({ screen: opts.screen, color: opts.color });
 
-		this._size = opts.size || 100;
+		this._size = opts.size ?? 100;
 		this._pos = opts.pos ? new Vec2(opts.pos) : new Vec2();
 
 		if (opts.visible !== undefined && !opts.visible) {
@@ -25,8 +25,12 @@ export class Brush extends Drawable {
 
 		this.screen.on('resize', () => {
 			const uniforms = this.shaderMaterial.uniforms;
-			uniforms.aspect.value = this.screen.w / this.screen.h;
-			uniforms.size.value = this._size / this.screen.h;
+			if (uniforms.aspect) {
+				uniforms.aspect.value = this.screen.w / this.screen.h;
+			}
+			if (uniforms.size) {
+				uniforms.size.value = this._size / this.screen.h;
+			}
 		});
 	}
 
@@ -35,7 +39,7 @@ export class Brush extends Drawable {
 	}
 	public set size(value: number) {
 		this._size = value;
-		if (this.visible) {
+		if (this.visible && this.shaderMaterial.uniforms.size) {
 			this.shaderMaterial.uniforms.size.value = this._size;
 		}
 	}
@@ -45,7 +49,7 @@ export class Brush extends Drawable {
 	}
 	public override set pos(value: TVec2Source) {
 		this._pos.copy(value);
-		if (this.visible) {
+		if (this.visible && this.shaderMaterial.uniforms.pos) {
 			this.shaderMaterial.uniforms.pos.value = new this.screen.three.Vector2(
 				(this._pos.x / this.screen.w - 0.5) * 2,
 				(-this._pos.y / this.screen.h + 0.5) * 2,
@@ -61,13 +65,19 @@ export class Brush extends Drawable {
 
 		if (this.visible) {
 			const uniforms = this.shaderMaterial.uniforms;
-			uniforms.pos.value = new this.screen.three.Vector2(this._pos.x, this._pos.y);
-			uniforms.size.value = this._size / this.screen.h;
-			uniforms.color.value = new this.screen.three.Vector3(
-				this._color.r,
-				this._color.g,
-				this._color.b,
-			);
+			if (uniforms.pos) {
+				uniforms.pos.value = new this.screen.three.Vector2(this._pos.x, this._pos.y);
+			}
+			if (uniforms.size) {
+				uniforms.size.value = this._size / this.screen.h;
+			}
+			if (uniforms.color) {
+				uniforms.color.value = new this.screen.three.Vector3(
+					this._color.r,
+					this._color.g,
+					this._color.b,
+				);
+			}
 		}
 	}
 
@@ -76,7 +86,7 @@ export class Brush extends Drawable {
 	}
 	public override set color(value: Color) {
 		this._color = value;
-		if (this.visible) {
+		if (this.visible && this.shaderMaterial.uniforms.color) {
 			this.shaderMaterial.uniforms.color.value = new this.screen.three.Vector3(
 				this._color.r,
 				this._color.g,
@@ -109,26 +119,26 @@ export class Brush extends Drawable {
 			},
 			vertexShader: `
 				varying vec3 projPos;
-				
+
 				void main() {
 					projPos  = position.xyz;
-					
+
 					gl_Position = vec4(position.xyz, 1.0);
 				}
 			`,
 			fragmentShader: `
 				varying vec3 projPos;
-				
+
 				uniform vec2  pos;
 				uniform float size;
 				uniform vec3  color;
 				uniform float aspect;
-				
+
 				void main() {
 					vec2 diff = projPos.xy - pos;
 					diff.x *= aspect;
 					float dist = length(diff);
-					
+
 					float opacity = pow(1.0 - min(1.0, abs(dist - size)), 100.0);
 					gl_FragColor = vec4(color, opacity);
 				}
@@ -139,8 +149,8 @@ export class Brush extends Drawable {
 		});
 	}
 
-	public override _build(opts: TBrushOpts): TDrawableMesh {
-		return new this.screen.three.Mesh(this._geo(), this._mat()) as unknown as TDrawableMesh;
+	public override _build(_opts: TBrushOpts): TDrawableMesh {
+		return new this.screen.three.Mesh(this._geo(), this._mat());
 	}
 
 	private get shaderMaterial(): THREE.ShaderMaterial {

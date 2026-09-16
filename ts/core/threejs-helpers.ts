@@ -5,7 +5,7 @@ import { download, getLogger } from '@node-3d/addon-tools';
 
 const logger = getLogger('core');
 
-type TFileLoadValue = string | ArrayBuffer | Blob | Record<string, never> | unknown;
+type TFileLoadValue = unknown;
 type TFileLoadCallback = (value: TFileLoadValue) => void;
 type TFileErrorCallback = (error: unknown) => void;
 type TFileLoaderThis = THREE.FileLoader & {
@@ -62,7 +62,7 @@ const finishLoad = (
 
 	const re = /charset="?([^;"\s]*)"?/iu;
 	const exec = re.exec(mimeType);
-	const label = exec && exec[1] ? exec[1].toLowerCase() : undefined;
+	const label = exec?.[1]?.toLowerCase();
 	const decoder = new TextDecoder(label);
 
 	onLoad(decoder.decode(buffer));
@@ -93,8 +93,10 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 	): THREE.FileLoader {
 		if (url.startsWith('data:')) {
 			const [head, body] = url.split(',');
-			const isBase64 = head.includes('base64');
-			const data = isBase64 ? Buffer.from(body, 'base64') : Buffer.from(unescape(body));
+			const isBase64 = head?.includes('base64');
+			const data = isBase64
+				? Buffer.from(body ?? '', 'base64')
+				: Buffer.from(decodeURIComponent(body ?? ''));
 			finishLoad(this.responseType, this.mimeType, onLoad, data);
 			return this;
 		}
@@ -116,7 +118,7 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 			return this;
 		}
 
-		const fsUrl = this.path === undefined ? url : this.path + url;
+		const fsUrl = this.path ? this.path + url : url;
 		fs.readFile(fsUrl, (error, data) => {
 			if (error) {
 				if (typeof onError === 'function') {
@@ -137,9 +139,11 @@ export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
 		const rawTexture = { _: id } as WebGLTexture;
 
 		const texture = new (three.Texture as typeof THREE.Texture)();
-		const properties = (renderer.properties?.get(texture) ?? texture) as TTextureProperties;
-		properties['__webglTexture'] = rawTexture;
-		properties['__webglInit'] = true;
+		const properties = (renderer.properties.get(texture) ?? texture) as TTextureProperties;
+		// oxlint-disable-next-line no-underscore-dangle
+		properties.__webglTexture = rawTexture;
+		// oxlint-disable-next-line no-underscore-dangle
+		properties.__webglInit = true;
 
 		return texture;
 	};

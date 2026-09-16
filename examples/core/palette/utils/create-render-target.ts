@@ -13,7 +13,9 @@ const createRenderTarget = (
 		colorSpace: three.LinearSRGBColorSpace,
 	});
 
-	materialPost.uniforms.t.value = newRt.texture;
+	if (materialPost.uniforms.t) {
+		materialPost.uniforms.t.value = newRt.texture;
+	}
 
 	return newRt;
 };

@@ -16,9 +16,9 @@ export type TSurfaceOpts = TRectOpts & {
 };
 
 export class Surface extends Rect {
-	private _events: EventEmitter;
-	private _camera: THREE.PerspectiveCamera;
-	private _scene: THREE.Scene;
+	private readonly _events: EventEmitter;
+	private readonly _camera: THREE.PerspectiveCamera;
+	private readonly _scene: THREE.Scene;
 	private _target: THREE.WebGLRenderTarget;
 
 	public constructor(opts: TSurfaceOpts) {
@@ -147,7 +147,9 @@ export class Surface extends Rect {
 	public reset(): void {
 		this._target = this._newTarget();
 		this.draw();
-		this.shaderMaterial.uniforms.t.value = this._target.texture;
+		if (this.shaderMaterial.uniforms.t) {
+			this.shaderMaterial.uniforms.t.value = this._target.texture;
+		}
 		this._events.emit('reset', this._target.texture);
 	}
 

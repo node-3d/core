@@ -47,9 +47,17 @@ controls.update();
 
 const gpuCompute = new GPUComputationRenderer(WIDTH, WIDTH, screen.renderer);
 const dtPosition = gpuCompute.createTexture();
-fillPositionAndPhase(dtPosition.image.data, BOUNDS);
+const positionData = dtPosition.image.data;
+if (!positionData) {
+	throw new Error('GPU computation position texture has no data buffer.');
+}
+fillPositionAndPhase(positionData, BOUNDS);
 const dtVelocity = gpuCompute.createTexture();
-fillVelocity(dtVelocity.image.data);
+const velocityData = dtVelocity.image.data;
+if (!velocityData) {
+	throw new Error('GPU computation velocity texture has no data buffer.');
+}
+fillVelocity(velocityData);
 
 const velocityVariable: Variable = gpuCompute.addVariable(
 	'textureVelocity',
@@ -76,7 +84,7 @@ velocityUniforms.alignmentDistance = new THREE.Uniform(20.0);
 velocityUniforms.cohesionDistance = new THREE.Uniform(20.0);
 velocityUniforms.predator = new THREE.Uniform(new THREE.Vector3());
 
-velocityVariable.material.defines['BOUNDS'] = BOUNDS.toFixed(2);
+velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed(2);
 velocityVariable.wrapS = THREE.RepeatWrapping;
 velocityVariable.wrapT = THREE.RepeatWrapping;
 positionVariable.wrapS = THREE.RepeatWrapping;
@@ -103,7 +111,7 @@ loopCommon(IS_PERF_MODE, (_now, delta, mouse) => {
 	positionUniforms.delta.value = delta;
 
 	velocityUniforms.delta.value = delta;
-	velocityUniforms.predator.value.set(predator[0], predator[1], 0);
+	(velocityUniforms.predator.value as THREE.Vector3).set(predator[0], predator[1], 0);
 
 	gpuCompute.compute();
 

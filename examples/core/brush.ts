@@ -1,6 +1,7 @@
 import * as three from 'three';
 
 import { Brush, Screen, init } from '@node-3d/core';
+import type { TMouseMoveEvent } from '@node-3d/glfw';
 
 const { loop } = init({
 	isGles3: true,
@@ -16,6 +17,6 @@ loop(() => screen.draw());
 
 const brush = new Brush({ screen, color: 0x00ff00 });
 
-screen.on('mousemove', (e) => {
+screen.on('mousemove', (e: TMouseMoveEvent) => {
 	brush.pos = [e.x, e.y];
 });

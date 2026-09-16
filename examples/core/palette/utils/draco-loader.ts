@@ -255,7 +255,7 @@ class DRACOLoader extends Loader {
 				fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}')),
 			].join('\n');
 
-			this.workerSourceURL = new URL(`data:text/javascript;utf8,${escape(body)}`);
+			this.workerSourceURL = new URL(`data:text/javascript;utf8,${encodeURIComponent(body)}`);
 			// this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
 		});
 

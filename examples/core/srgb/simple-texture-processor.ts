@@ -8,7 +8,7 @@ const createShaderMaterial = (
 	sizeY: number,
 ) => {
 	const material = new ShaderMaterial({
-		uniforms: uniforms || {},
+		uniforms,
 		vertexShader: `
       void main() {
         gl_Position = vec4( position, 1.0 );
@@ -16,7 +16,7 @@ const createShaderMaterial = (
 		fragmentShader: computeFragmentShader,
 	});
 
-	material.defines['resolution'] = `vec2( ${sizeX.toFixed(1)}, ${sizeY.toFixed(1)} )`;
+	material.defines.resolution = `vec2( ${sizeX.toFixed(1)}, ${sizeY.toFixed(1)} )`;
 
 	return material;
 };

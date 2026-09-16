@@ -66,14 +66,10 @@ export class Color extends Vec4 {
 		let b = 0;
 		let a = 1;
 
-		if (source === null) {
-			return { r, g, b, a };
-		}
-
 		if (Array.isArray(source) || source instanceof Color) {
-			r = source[0];
-			g = source[1];
-			b = source[2];
+			r = source[0] ?? 0;
+			g = source[1] ?? 0;
+			b = source[2] ?? 0;
 			a = typeof source[3] === 'number' ? source[3] : 1;
 		} else if (hasRgb(source)) {
 			r = source.r;

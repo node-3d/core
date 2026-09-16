@@ -13,7 +13,7 @@ const flipUv = (
 		return;
 	}
 	for (let i = 1; i < attribute.array.length; i += 2) {
-		attribute.array[i] = 1 - attribute.array[i];
+		attribute.array[i] = 1 - (attribute.array[i] ?? 0);
 	}
 };
 
@@ -22,14 +22,14 @@ const populateScene = (scene: THREE.Scene, cb: (mesh: THREE.Object3D) => void): 
 		public constructor(name: TWorkerConstructorArg, options?: TWorkerOptions) {
 			const nameStr = name.toString();
 			if (nameStr.startsWith('data:')) {
-				const [, body] = nameStr.toString().split(',');
-				super(unescape(body), { ...options, eval: true });
+				const [, body] = nameStr.split(',');
+				super(decodeURIComponent(body ?? ''), { ...options, eval: true });
 				return;
 			}
 
 			super(name, options);
 		}
-	} as unknown as typeof Worker;
+	};
 
 	(async () => {
 		const THREE = await import('three');
@@ -83,10 +83,10 @@ const populateScene = (scene: THREE.Scene, cb: (mesh: THREE.Object3D) => void): 
 				gltf.scene.scale.set(0.01, 0.01, 0.01);
 
 				gltf.scene.traverse((node) => {
-					const mesh = node as THREE.Mesh;
-					if (!mesh.isMesh) {
+					if (!('isMesh' in node && node.isMesh)) {
 						return;
 					}
+					const mesh = node as THREE.Mesh;
 					mesh.castShadow = true;
 					flipUv(mesh.geometry.attributes.uv);
 					flipUv(mesh.geometry.attributes.uv1);

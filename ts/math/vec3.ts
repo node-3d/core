@@ -20,7 +20,7 @@ const hasXYZ = (value: object): value is TVec3Object =>
  */
 export class Vec3 extends Vec2 {
 	public constructor(x?: TVec3CtorArg, y?: number | TVec2Source, z?: number) {
-		super(x as number | TVec2Source | null | undefined, typeof y === 'number' ? y : undefined);
+		super(x, typeof y === 'number' ? y : undefined);
 
 		this.z = 0;
 
@@ -36,7 +36,7 @@ export class Vec3 extends Vec2 {
 		}
 
 		if (Array.isArray(x) || x instanceof Vec3) {
-			this.z = x[2];
+			this.z = x[2] ?? 0;
 			return;
 		}
 
@@ -47,7 +47,7 @@ export class Vec3 extends Vec2 {
 
 		if (x instanceof Vec2) {
 			if (Array.isArray(y) || y instanceof Vec2) {
-				this.z = y[0];
+				this.z = y[0] ?? 0;
 			} else if (typeof y === 'number') {
 				this.z = y;
 			}
@@ -55,7 +55,7 @@ export class Vec3 extends Vec2 {
 	}
 
 	public get z(): number {
-		return this[2];
+		return this[2] ?? 0;
 	}
 	public set z(value: number) {
 		this[2] = value;
@@ -71,7 +71,7 @@ export class Vec3 extends Vec2 {
 	}
 
 	public get yxz(): Vec3 {
-		return new Vec3([this[1], this[0], this[2]]);
+		return new Vec3([this[1] ?? 0, this[0] ?? 0, this[2] ?? 0]);
 	}
 	public set yxz(value: TVec3Source) {
 		this[1] = value[0];
@@ -80,7 +80,7 @@ export class Vec3 extends Vec2 {
 	}
 
 	public get zyx(): Vec3 {
-		return new Vec3([this[2], this[1], this[0]]);
+		return new Vec3([this[2] ?? 0, this[1] ?? 0, this[0] ?? 0]);
 	}
 	public set zyx(value: TVec3Source) {
 		this[2] = value[0];
@@ -89,7 +89,7 @@ export class Vec3 extends Vec2 {
 	}
 
 	public get yzx(): Vec3 {
-		return new Vec3([this[1], this[2], this[0]]);
+		return new Vec3([this[1] ?? 0, this[2] ?? 0, this[0] ?? 0]);
 	}
 	public set yzx(value: TVec3Source) {
 		this[0] = value[0];
@@ -98,7 +98,7 @@ export class Vec3 extends Vec2 {
 	}
 
 	public get xzy(): Vec3 {
-		return new Vec3([this[0], this[2], this[1]]);
+		return new Vec3([this[0] ?? 0, this[2] ?? 0, this[1] ?? 0]);
 	}
 	public set xzy(value: TVec3Source) {
 		this[0] = value[0];
@@ -108,63 +108,63 @@ export class Vec3 extends Vec2 {
 
 	public override plused(other: TVec3Source): this {
 		super.plused(other);
-		this[2] += other[2];
+		this[2] = (this[2] ?? 0) + other[2];
 		return this;
 	}
 	public override minused(other: TVec3Source): this {
 		super.minused(other);
-		this[2] -= other[2];
+		this[2] = (this[2] ?? 0) - other[2];
 		return this;
 	}
 	public override muled(other: TVec3Source): this {
 		super.muled(other);
-		this[2] *= other[2];
+		this[2] = (this[2] ?? 0) * other[2];
 		return this;
 	}
 	public override dived(other: TVec3Source): this {
 		super.dived(other);
-		this[2] /= other[2];
+		this[2] = (this[2] ?? 0) / other[2];
 		return this;
 	}
 	public override maxed(other: TVec3Source): this {
 		super.maxed(other);
-		this[2] = Math.max(this[2], other[2]);
+		this[2] = Math.max(this[2] ?? 0, other[2]);
 		return this;
 	}
 	public override mined(other: TVec3Source): this {
 		super.mined(other);
-		this[2] = Math.min(this[2], other[2]);
+		this[2] = Math.min(this[2] ?? 0, other[2]);
 		return this;
 	}
 
 	public override get neged(): this {
-		this[0] = -this[0];
-		this[1] = -this[1];
-		this[2] = -this[2];
+		this[0] = -(this[0] ?? 0);
+		this[1] = -(this[1] ?? 0);
+		this[2] = -(this[2] ?? 0);
 		return this;
 	}
 
 	public override scaled(scalar: number): this {
 		super.scaled(scalar);
-		this[2] *= scalar;
+		this[2] = (this[2] ?? 0) * scalar;
 		return this;
 	}
 	public override fracted(scalar: number): this {
 		super.fracted(scalar);
-		this[2] /= scalar;
+		this[2] = (this[2] ?? 0) / scalar;
 		return this;
 	}
 
 	public override get rounded(): this {
-		this[2] = Math.round(this[2]);
+		this[2] = Math.round(this[2] ?? 0);
 		return super.rounded;
 	}
 	public override get floored(): this {
-		this[2] = Math.floor(this[2]);
+		this[2] = Math.floor(this[2] ?? 0);
 		return super.floored;
 	}
 	public override get ceiled(): this {
-		this[2] = Math.ceil(this[2]);
+		this[2] = Math.ceil(this[2] ?? 0);
 		return super.ceiled;
 	}
 
@@ -172,11 +172,11 @@ export class Vec3 extends Vec2 {
 		return super.isZero && this[2] === 0;
 	}
 	public override cmp(cb: TVecCompare): boolean {
-		return super.cmp(cb) && cb(this[2], 2);
+		return super.cmp(cb) && cb(this[2] ?? 0, 2);
 	}
 
 	public override dot(other: TVec3Source): number {
-		return super.dot(other) + this[2] * other[2];
+		return super.dot(other) + (this[2] ?? 0) * other[2];
 	}
 
 	public override toString(): string {

@@ -1,34 +1,4 @@
 {
-	"compilerOptions": {
-		"target": "ES2024",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"strict": true,
-		"allowImportingTsExtensions": true,
-		"rewriteRelativeImportExtensions": true,
-		"declaration": true,
-		"declarationMap": false,
-		"sourceMap": false,
-		"rootDir": ".",
-		"outDir": "dist",
-		"paths": {
-			"@node-3d/core": [
-				"./ts/index.ts"
-			],
-			"@node-3d/glfw": [
-				"../glfw"
-			]
-		},
-		"verbatimModuleSyntax": true,
-		"skipLibCheck": true,
-		"types": [
-			"node"
-		]
-	},
-	"include": [
-		"*.ts",
-		"ts/**/*.ts",
-		"test/**/*.ts",
-		"examples/**/*.ts"
-	]
+	"extends": "@node-3d/addon-tools/tsconfig.base.json",
+	"include": ["*.ts", "ts/**/*.ts", "test/**/*.ts", "examples/**/*.ts"]
 }

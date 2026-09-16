@@ -70,8 +70,8 @@ let frameCount = 0;
 cl.setKernelArg(kernelUpdate, 0, 'uint', BIRDS);
 cl.setKernelArg(kernelUpdate, 1, 'float', 0.016); // dynamic
 cl.setKernelArg(kernelUpdate, 2, 'float', BOUNDS);
-cl.setKernelArg(kernelUpdate, 3, 'float', -10000); // dynamic
-cl.setKernelArg(kernelUpdate, 4, 'float', -10000); // dynamic
+cl.setKernelArg(kernelUpdate, 3, 'float', -10_000); // dynamic
+cl.setKernelArg(kernelUpdate, 4, 'float', -10_000); // dynamic
 cl.setKernelArg(kernelUpdate, 5, 'float', separation);
 cl.setKernelArg(kernelUpdate, 6, 'float', alignment);
 cl.setKernelArg(kernelUpdate, 7, 'float', cohesion);

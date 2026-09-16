@@ -1,6 +1,7 @@
 import * as three from 'three';
 
 import { Points, Rect, Screen, Surface, gl, init } from '@node-3d/core';
+import type { TMouseEvent } from '@node-3d/glfw';
 
 const { loop } = init({
 	isGles3: true,
@@ -11,7 +12,7 @@ const { loop } = init({
 	title: 'Surface',
 });
 
-const VBO_SIZE = 10000;
+const VBO_SIZE = 10_000;
 
 const screen = new Screen({ three });
 loop(() => screen.draw());
@@ -68,7 +69,7 @@ screen.on('mouseup', () => {
 	isRotating = false;
 });
 
-screen.on('mousemove', (e) => {
+screen.on('mousemove', (e: TMouseEvent) => {
 	const dx = mouse.x - e.x;
 	const dy = mouse.y - e.y;
 

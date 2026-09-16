@@ -32,13 +32,14 @@ export class Drawable {
 	protected _z: number;
 	protected _visible: boolean;
 	protected _mesh: TDrawableMesh;
-	protected _color!: Color;
+	protected _color: Color;
 
 	public constructor(opts: TDrawableOpts) {
 		this._screen = opts.screen;
 		this._three = this._screen.three;
 
-		this._pos = new Vec2(opts.pos || [0, 0]);
+		this._color = new Color(0xffffff);
+		this._pos = new Vec2(opts.pos ?? [0, 0]);
 		this._z = 0;
 		this._visible = true;
 		this._mesh = this._build(opts);
@@ -47,7 +48,7 @@ export class Drawable {
 
 		this.color = Drawable.makeColor(opts.color);
 		this.pos = this._pos;
-		this.z = opts.z || 0;
+		this.z = opts.z ?? 0;
 	}
 
 	public get three(): TThree {
@@ -96,7 +97,7 @@ export class Drawable {
 		this._mesh.position.y = this._pos.y;
 	}
 
-	public get color(): Color | null {
+	public get color(): Color {
 		return this._color;
 	}
 	public set color(value: Color) {
@@ -105,16 +106,13 @@ export class Drawable {
 		if (this.mat.color) {
 			this.mat.color.setHex(this._color.toHex());
 		}
-		if (this.mat.opacity !== undefined) {
+		if (this.mat.transparent) {
 			this.mat.opacity = this._color.a;
 		}
 	}
 
 	public _build(opts: TDrawableOpts): TDrawableMesh {
-		return new this.screen.three.Mesh(
-			this._geo(opts),
-			this._mat(opts),
-		) as unknown as TDrawableMesh;
+		return new this.screen.three.Mesh(this._geo(opts), this._mat(opts));
 	}
 
 	public _geo(_opts?: TDrawableOpts): THREE.BufferGeometry {
@@ -122,7 +120,7 @@ export class Drawable {
 	}
 
 	public updateGeo(): void {
-		this._mesh.geometry = this._geo(this as unknown as TDrawableOpts);
+		this._mesh.geometry = this._geo(this);
 		(this._mesh.geometry as THREE.BufferGeometry & { needsUpdate?: boolean }).needsUpdate =
 			true;
 	}

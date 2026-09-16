@@ -30,7 +30,7 @@ const bootstrapHeadlessGlfw = async (): Promise<TGlfw | null> => {
 
 	// @node-3d/glfw normally initializes on import. CI headless tests need
 	// glfwInitHint before glfwInit so they can use the Null platform.
-	nodeGlobal['__isGlfwInited'] = true;
+	nodeGlobal.__isGlfwInited = true;
 	const { glfw: bootstrappedGlfw } = await import('@node-3d/glfw');
 	bootstrappedGlfw.initHint(bootstrappedGlfw.PLATFORM, bootstrappedGlfw.PLATFORM_NULL);
 
@@ -39,7 +39,7 @@ const bootstrapHeadlessGlfw = async (): Promise<TGlfw | null> => {
 	}
 
 	bootstrappedGlfw.defaultWindowHints();
-	nodeGlobal['__isGlfwInited'] = true;
+	nodeGlobal.__isGlfwInited = true;
 
 	return bootstrappedGlfw;
 };

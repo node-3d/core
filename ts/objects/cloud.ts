@@ -1,5 +1,5 @@
 import type * as THREE from 'three';
-import type { Color } from '../math/color.ts';
+import { Color } from '../math/color.ts';
 import { Drawable } from './drawable.ts';
 import type { TDrawableMesh, TDrawableOpts, TMaterialWithCoreProps } from './drawable.ts';
 
@@ -27,7 +27,7 @@ export type TCloudOpts = TDrawableOpts & {
 	frag?: string;
 	inject?: TShaderInject;
 	size?: number | string;
-	mode?: 'segments' | 'loop' | string;
+	mode?: 'segments' | 'loop' | undefined;
 };
 
 export type TCloudAttribute = Readonly<{
@@ -40,16 +40,16 @@ export class Cloud extends Drawable {
 		super(opts);
 	}
 
-	public override get color(): null {
-		return null;
+	public override get color(): Color {
+		return new Color(0xffffff);
 	}
-	public override set color(_value: Color | null) {
+	public override set color(_value: Color) {
 		/* do nothing */
 	}
 
 	public buildAttr(source: TCloudAttribute, count: number): THREE.GLBufferAttribute {
 		return new this.screen.three.GLBufferAttribute(
-			source.vbo as unknown as WebGLBuffer,
+			source.vbo,
 			this.screen.context.FLOAT,
 			source.items,
 			4,
@@ -99,23 +99,23 @@ export class Cloud extends Drawable {
 
 	public buildVert(opts: TCloudOpts): string {
 		return (
-			opts.vert ||
+        opts.vert ??
 			`
 			attribute vec3  color;
 			varying   vec3  varColor;
-			
+
 			${opts.inject?.vert?.vars ?? ''}
-			
+
 			void main() {
-				
+
 				${opts.inject?.vert?.before ?? ''}
-				
+
 				varColor        = color;
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 				gl_Position     = projectionMatrix * mvPosition;
-				
+
 				${opts.inject?.vert?.after ?? ''}
-				
+
 			}
 		`
 		);
@@ -123,21 +123,21 @@ export class Cloud extends Drawable {
 
 	public buildFrag(opts: TCloudOpts): string {
 		return (
-			opts.frag ||
+        opts.frag ??
 			`
 			varying vec3  varColor;
-			
+
 			${opts.inject?.frag?.vars ?? ''}
-			
+
 			void main() {
-				
+
 				${opts.inject?.frag?.before ?? ''}
-				
+
 				// gl_FragColor = vec4(varColor, 1.0);
 				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-				
+
 				${opts.inject?.frag?.after ?? ''}
-				
+
 			}
 		`
 		);
@@ -148,6 +148,6 @@ export class Cloud extends Drawable {
 		points.frustumCulled = false;
 		(points as THREE.Points & { boundingSphere?: THREE.Sphere }).boundingSphere =
 			new this.screen.three.Sphere(new this.screen.three.Vector3(), Infinity);
-		return points as unknown as TDrawableMesh;
+		return points;
 	}
 }

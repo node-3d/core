@@ -104,7 +104,7 @@ const { doc, loop } = init({
 });
 addThreeHelpers(THREE);
 
-const monitorRate = doc.getCurrentMonitor()?.rate || 60;
+const monitorRate = doc.getCurrentMonitor()?.rate ?? 60;
 const targetMs = 1000 / monitorRate;
 
 console.log('pacing-stress', {
@@ -340,6 +340,9 @@ loop((timelineNow) => {
 
 	for (let i = 0; i < meshes.length; i++) {
 		const mesh = meshes[i];
+		if (!mesh) {
+			continue;
+		}
 		mesh.rotation.x += (0.18 + (i % 7) * 0.006) * timelineDt;
 		mesh.rotation.y += (0.24 + (i % 5) * 0.006) * timelineDt;
 	}

@@ -5,7 +5,7 @@ import { screenshot } from './screenshot.ts';
 import { window, document } from './init.ts';
 import * as three from 'three';
 
-const loadBox = () =>
+const loadBox = async () =>
 	new Promise<three.Mesh>((res) => {
 		const geometry = new three.BoxGeometry();
 		const material = new three.MeshBasicMaterial();

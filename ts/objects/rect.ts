@@ -38,10 +38,10 @@ export class Rect extends Drawable {
 		const material = this._mat(opts);
 
 		if (opts.wire) {
-			return new this.screen.three.Line(geometry, material) as unknown as TDrawableMesh;
+			return new this.screen.three.Line(geometry, material);
 		}
 
-		return new this.screen.three.Mesh(geometry, material) as unknown as TDrawableMesh;
+		return new this.screen.three.Mesh(geometry, material);
 	}
 
 	public override _mat(opts: TRectOpts): TMaterialWithCoreProps {
@@ -99,7 +99,7 @@ export class Rect extends Drawable {
 
 	public override _geo(opts: TRectOpts): THREE.BufferGeometry {
 		const size = opts.size === undefined ? new Vec2(100, 100) : new Vec2(opts.size);
-		const radius = opts.radius || 0;
+		const radius = opts.radius ?? 0;
 		const width = size.x;
 		const height = size.y;
 		const geometry: THREE.BufferGeometry = radius

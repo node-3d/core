@@ -80,12 +80,12 @@ const cameraOrtho = new THREE.OrthographicCamera(
 	halfWidth,
 	halfHeight,
 	-halfHeight,
-	-10000,
-	10000,
+	-1000,
+	1000,
 );
 cameraOrtho.position.z = 100;
 
-const cameraPerspective = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
+const cameraPerspective = new THREE.PerspectiveCamera(50, width / height, 1, 1000);
 cameraPerspective.position.z = 900;
 
 //
@@ -128,9 +128,7 @@ sceneMask.add(quadMask);
 
 // When switching from fullscreen and back, reset renderer to update VAO/FBO objects
 const resetRenderer = (): undefined => {
-	if (renderer) {
-		renderer.dispose();
-	}
+	renderer.dispose();
 
 	renderer = new THREE.WebGLRenderer({
 		context: gl as unknown as WebGLRenderingContext,
@@ -179,12 +177,20 @@ const effectSepia = new ShaderPass(shaderSepia);
 const effectVignette = new ShaderPass(shaderVignette);
 // const gammaCorrection = new ShaderPass(GammaCorrectionShader);
 
-effectBleach.uniforms['opacity'].value = 0.95;
+if (effectBleach.uniforms.opacity) {
+	effectBleach.uniforms.opacity.value = 0.95;
+}
 
-effectSepia.uniforms['amount'].value = 0.9;
+if (effectSepia.uniforms.amount) {
+	effectSepia.uniforms.amount.value = 0.9;
+}
 
-effectVignette.uniforms['offset'].value = 0.95;
-effectVignette.uniforms['darkness'].value = 1.6;
+if (effectVignette.uniforms.offset) {
+	effectVignette.uniforms.offset.value = 0.95;
+}
+if (effectVignette.uniforms.darkness) {
+	effectVignette.uniforms.darkness.value = 1.6;
+}
 
 const effectBloom = new BloomPass(0.5);
 const effectFilm = new FilmPass(0.35);
@@ -193,13 +199,17 @@ const effectDotScreen = new DotScreenPass(new THREE.Vector2(0, 0), 0.5, 0.8);
 
 const effectHBlur = new ShaderPass(HorizontalBlurShader);
 const effectVBlur = new ShaderPass(VerticalBlurShader);
-effectHBlur.uniforms['h'].value = 2 / (width / 2);
-effectVBlur.uniforms['v'].value = 2 / (height / 2);
+if (effectHBlur.uniforms.h) {
+	effectHBlur.uniforms.h.value = 2 / (width / 2);
+}
+if (effectVBlur.uniforms.v) {
+	effectVBlur.uniforms.v.value = 2 / (height / 2);
+}
 
 const effectColorify1 = new ShaderPass(ColorifyShader);
 const effectColorify2 = new ShaderPass(ColorifyShader);
-effectColorify1.uniforms['color'] = new THREE.Uniform(new THREE.Color(1, 0.8, 0.8));
-effectColorify2.uniforms['color'] = new THREE.Uniform(new THREE.Color(1, 0.75, 0.5));
+effectColorify1.uniforms.color = new THREE.Uniform(new THREE.Color(1, 0.8, 0.8));
+effectColorify2.uniforms.color = new THREE.Uniform(new THREE.Color(1, 0.75, 0.5));
 
 const clearMask = new ClearMaskPass();
 const renderMask = new MaskPass(sceneModel, cameraPerspective);
@@ -293,7 +303,9 @@ composer4.addPass(effectFilm);
 composer4.addPass(effectBleach);
 composer4.addPass(effectVignette);
 
-renderScene.uniforms['tDiffuse'].value = composerScene.renderTarget2.texture;
+if (renderScene.uniforms.tDiffuse) {
+	renderScene.uniforms.tDiffuse.value = composerScene.renderTarget2.texture;
+}
 
 const onWindowResize = (): undefined => {
 	halfWidth = window.innerWidth / 2;
@@ -311,15 +323,15 @@ const onWindowResize = (): undefined => {
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
-	composerScene?.setSize(halfWidth * 2, halfHeight * 2);
+	composerScene.setSize(halfWidth * 2, halfHeight * 2);
 
-	composer1?.setSize(halfWidth, halfHeight);
-	composer2?.setSize(halfWidth, halfHeight);
-	composer3?.setSize(halfWidth, halfHeight);
-	composer4?.setSize(halfWidth, halfHeight);
+	composer1.setSize(halfWidth, halfHeight);
+	composer2.setSize(halfWidth, halfHeight);
+	composer3.setSize(halfWidth, halfHeight);
+	composer4.setSize(halfWidth, halfHeight);
 
-	if (renderScene && composerScene) {
-		renderScene.uniforms['tDiffuse'].value = composerScene.renderTarget2.texture;
+	if (renderScene.uniforms.tDiffuse) {
+		renderScene.uniforms.tDiffuse.value = composerScene.renderTarget2.texture;
 	}
 
 	quadBG.scale.set(window.innerWidth, window.innerHeight, 1);
@@ -350,7 +362,7 @@ const createMesh = (geometry: THREE.BufferGeometry, scene: THREE.Scene, scale: n
 
 const loader = new GLTFLoader();
 loader.load('models/LeePerrySmith.glb', (gltf) => {
-	const model = gltf.scene.children[0] as THREE.Mesh<THREE.BufferGeometry>;
+	const model = gltf.scene.children[0] as THREE.Mesh;
 	createMesh(model.geometry, sceneModel, 100);
 });
 
@@ -367,19 +379,19 @@ loop((now) => {
 	}
 
 	renderer.setViewport(0, 0, halfWidth, halfHeight);
-	composerScene?.render(delta);
+	composerScene.render(delta);
 
 	renderer.setViewport(0, 0, halfWidth, halfHeight);
-	composer1?.render(delta);
+	composer1.render(delta);
 
 	renderer.setViewport(halfWidth, 0, halfWidth, halfHeight);
-	composer2?.render(delta);
+	composer2.render(delta);
 
 	renderer.setViewport(0, halfHeight, halfWidth, halfHeight);
-	composer3?.render(delta);
+	composer3.render(delta);
 
 	renderer.setViewport(halfWidth, halfHeight, halfWidth, halfHeight);
-	composer4?.render(delta);
+	composer4.render(delta);
 
 	if (!IS_PERF_MODE) {
 		return;

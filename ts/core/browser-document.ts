@@ -2,24 +2,19 @@ import { getLogger } from '@node-3d/addon-tools';
 import { Image } from '@node-3d/image';
 import { glfw } from '@node-3d/glfw';
 import { webgl } from '@node-3d/webgl';
-import type { TCbVoid, TSize, TWindowOpts } from '@node-3d/glfw';
+import type { TCbVoid, TKeyEvent, TMouseEvent, TSize, TWindowOpts } from '@node-3d/glfw';
 import { BrowserWindow } from './browser-window.ts';
 
 const logger = getLogger('core');
-const ESC_KEY = 27;
-const F_KEY = 70;
 
 type TShortcutKeyEvent = Readonly<{
 	code: string | null;
 	key: string | null;
-	keyCode?: unknown;
 }>;
 
-const isEscapeKey = (event: TShortcutKeyEvent): boolean =>
-	event.key === 'Escape' || event.code === 'Escape' || event.keyCode === ESC_KEY;
+const isEscapeKey = (event: TShortcutKeyEvent): boolean => event.key === 'Escape';
 
-const isFKey = (event: TShortcutKeyEvent): boolean =>
-	event.key === 'f' || event.key === 'F' || event.code === 'KeyF' || event.keyCode === F_KEY;
+const isFKey = (event: TShortcutKeyEvent): boolean => event.code === 'KeyF';
 
 export type TBrowserDocumentOpts = TWindowOpts &
 	Readonly<
@@ -102,13 +97,13 @@ export class BrowserDocument extends BrowserWindow {
 		}
 		mutableWebgl.canvas = this;
 
-		this.on('mousedown', (e) => {
+		this.on('mousedown', (e: TMouseEvent) => {
 			this.emit('pointerdown', e);
 		});
-		this.on('mouseup', (e) => {
+		this.on('mouseup', (e: TMouseEvent) => {
 			this.emit('pointerup', e);
 		});
-		this.on('mousemove', (e) => {
+		this.on('mousemove', (e: TMouseEvent) => {
 			this.emit('pointermove', e);
 		});
 
@@ -121,7 +116,7 @@ export class BrowserDocument extends BrowserWindow {
 			this.on('quit', () => BrowserWindow.exit());
 
 			if (opts.autoEsc) {
-				this.on('keydown', (e) => {
+				this.on('keydown', (e: TKeyEvent) => {
 					if (isEscapeKey(e)) {
 						BrowserWindow.exit();
 					}
@@ -130,7 +125,7 @@ export class BrowserDocument extends BrowserWindow {
 		}
 
 		if (opts.autoFullscreen) {
-			this.on('keydown', (e) => {
+			this.on('keydown', (e: TKeyEvent) => {
 				if (!isFKey(e)) {
 					return;
 				}
@@ -156,7 +151,7 @@ export class BrowserDocument extends BrowserWindow {
 		this.setInputMode(glfw.CURSOR, glfw.CURSOR_NORMAL);
 	};
 
-	public makeCurrent(): void {
+	public override makeCurrent(): void {
 		mutableWebgl.canvas = this;
 		super.makeCurrent();
 	}

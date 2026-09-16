@@ -8,7 +8,7 @@ export type TMouseWorld = readonly [x: number, y: number];
 type TScreen = InstanceType<typeof node3d.Screen>;
 type TCbLoop = (now: number, dt: number, mouse: TMouseNdc) => void;
 
-const OFFSCREEN_MOUSE: TMouseWorld = [-10000, -10000];
+const OFFSCREEN_MOUSE: TMouseWorld = [-10_000, -10_000];
 
 export const projectMouseToZPlane = (screen: TScreen, mouse: TMouseNdc): TMouseWorld => {
 	if (!mouse) {

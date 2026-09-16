@@ -13,10 +13,11 @@ on:
 
 jobs:
   unit-tests:
-    name: Unit Tests (${{ matrix.target }})
+    name: Unit Tests (${{ matrix.target }}, Node ${{ matrix.node_version }})
     strategy:
       fail-fast: false
       matrix:
+        node_version: [22.18.0, 24.13.0, 26.8.1]
         include:
           - target: windows-x64
             os: windows-2022
@@ -49,7 +50,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.13.0
+          node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.node_arch }}
           cache: 'npm'
 

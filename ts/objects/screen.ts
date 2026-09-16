@@ -56,12 +56,12 @@ type TScreenImplementations = Readonly<{
 }>;
 
 export class Screen extends EventEmitter {
-	private _three: TThree;
-	private _gl: TWebgl;
-	private _doc: TDocument;
-	private _Image: TImageConstructor;
-	private _camera: TScreenCamera;
-	private _scene: THREE.Scene;
+	private readonly _three: TThree;
+	private readonly _gl: TWebgl;
+	private readonly _doc: TDocument;
+	private readonly _Image: TImageConstructor;
+	private readonly _camera: TScreenCamera;
+	private readonly _scene: THREE.Scene;
 	private _renderer!: THREE.WebGLRenderer;
 	private _autoRenderer = false;
 
@@ -79,7 +79,7 @@ export class Screen extends EventEmitter {
 		}
 
 		this._camera = this._createCamera(opts);
-		this._scene = (opts.scene as THREE.Scene) ?? new this._three.Scene();
+		this._scene = (opts.scene as THREE.Scene | undefined) ?? new this._three.Scene();
 
 		if (opts.renderer) {
 			this._autoRenderer = false;
@@ -145,7 +145,7 @@ export class Screen extends EventEmitter {
 		return this._doc.icon;
 	}
 	public set icon(value: TIcon) {
-		this._doc.icon = value || null;
+		this._doc.icon = value ?? null;
 	}
 
 	public get fov(): number {
@@ -196,7 +196,9 @@ export class Screen extends EventEmitter {
 			'mousemove',
 			'mousewheel',
 		]) {
-			this._doc.on(type, (event: unknown) => this.emit(type, event));
+			this._doc.on(type, (event: unknown) => {
+				this.emit(type, event);
+			});
 		}
 	}
 
@@ -253,10 +255,11 @@ export class Screen extends EventEmitter {
 
 	private static resolveImplementations(opts: TScreenOpts): TScreenImplementations {
 		const nodeGlobal = globalThis as unknown as TNode3DGlobal;
-		const three = ((opts.three ?? opts.THREE) as TThree) ?? nodeGlobal.THREE;
-		const gl = (opts.gl as TWebgl) ?? nodeGlobal['_gl'];
-		const doc = ((opts.doc ?? opts.document) as TDocument) ?? nodeGlobal.document;
-		const Image = (opts.Image as unknown as TImageConstructor) ?? nodeGlobal.Image;
+		const three = ((opts.three ?? opts.THREE) as TThree | undefined) ?? nodeGlobal.THREE;
+		// oxlint-disable-next-line no-underscore-dangle
+		const gl = (opts.gl as TWebgl | undefined) ?? nodeGlobal._gl;
+		const doc = ((opts.doc ?? opts.document) as TDocument | undefined) ?? nodeGlobal.document;
+		const Image = (opts.Image as TImageConstructor | undefined) ?? nodeGlobal.Image;
 
 		if (!three || !gl || !doc || !Image) {
 			throw new Error('Screen requires three, webgl, document, and Image implementations.');
