@@ -19,8 +19,6 @@
 	"files": [
 		"dist",
 		"LICENSE",
-		"package.json",
-		"tsconfig.json",
 		"tsconfig.build.json"
 	],
 	"engines": {
@@ -28,6 +26,7 @@
 		"npm": ">=10.9.0"
 	},
 	"scripts": {
+		"i": "npm install --workspaces=false",
 		"test:watch": "node --test --watch \"test/**/*.test.ts\"",
 		"test:ci": "node --test \"test/**/*.test.ts\"",
 		"lint:oxlint": "oxlint .",
