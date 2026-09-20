@@ -1,4 +1,4 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { Drawable } from './drawable.ts';
 import type { TDrawableMesh, TDrawableOpts, TMaterialWithCoreProps } from './drawable.ts';
 import { Vec2 } from '../math/vec2.ts';
@@ -38,25 +38,25 @@ export class Rect extends Drawable {
 		const material = this._mat(opts);
 
 		if (opts.wire) {
-			return new this.screen.three.Line(geometry, material);
+			return new THREE.Line(geometry, material);
 		}
 
-		return new this.screen.three.Mesh(geometry, material);
+		return new THREE.Mesh(geometry, material);
 	}
 
 	public override _mat(opts: TRectOpts): TMaterialWithCoreProps {
 		const matOpts = {
 			transparent: true,
-			side: this.screen.three.DoubleSide,
+			side: THREE.DoubleSide,
 			depthWrite: false,
 			depthTest: false,
 		};
 
 		if (opts.wire) {
-			return new this.screen.three.LineBasicMaterial({ ...matOpts, linewidth: 1 });
+			return new THREE.LineBasicMaterial({ ...matOpts, linewidth: 1 });
 		}
 
-		return new this.screen.three.MeshBasicMaterial(matOpts);
+		return new THREE.MeshBasicMaterial(matOpts);
 	}
 
 	public get size(): Vec2 {
@@ -104,7 +104,7 @@ export class Rect extends Drawable {
 		const height = size.y;
 		const geometry: THREE.BufferGeometry = radius
 			? (() => {
-					const shape = new this.screen.three.Shape();
+					const shape = new THREE.Shape();
 
 					shape.moveTo(0, radius);
 					shape.lineTo(0, height - radius);
@@ -116,11 +116,11 @@ export class Rect extends Drawable {
 					shape.lineTo(radius, 0);
 					shape.quadraticCurveTo(0, 0, 0, radius);
 
-					const shapeGeometry = new this.screen.three.ShapeGeometry(shape);
+					const shapeGeometry = new THREE.ShapeGeometry(shape);
 					shapeGeometry.translate(-width * 0.5, -height * 0.5, 0);
 					return shapeGeometry;
 				})()
-			: new this.screen.three.PlaneGeometry(width, height);
+			: new THREE.PlaneGeometry(width, height);
 
 		geometry.rotateX(Math.PI);
 		geometry.translate(width * 0.5, height * 0.5, 0);

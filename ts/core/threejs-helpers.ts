@@ -1,6 +1,6 @@
 import { Blob } from 'node:buffer';
 import fs from 'node:fs';
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { download, getLogger } from '@node-3d/addon-tools';
 
 const logger = getLogger('core');
@@ -73,7 +73,8 @@ export type ThreeHelpersTargets = {
 	Texture: unknown;
 };
 
-export const addThreeHelpers = (three: ThreeHelpersTargets): void => {
+export const addThreeHelpers = (): void => {
+	const three = THREE as ThreeHelpersTargets;
 	const fileLoaderPrototype = (three.FileLoader as typeof THREE.FileLoader)
 		.prototype as unknown as {
 		load: (

@@ -1,5 +1,3 @@
-import * as three from 'three';
-
 import { Brush, Screen, init } from '@node-3d/core';
 import type { TMouseMoveEvent } from '@node-3d/glfw';
 
@@ -12,7 +10,7 @@ const { loop } = init({
 	title: 'Brush',
 });
 
-const screen = new Screen({ three });
+const screen = new Screen();
 loop(() => screen.draw());
 
 const brush = new Brush({ screen, color: 0x00ff00 });

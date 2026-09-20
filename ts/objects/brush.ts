@@ -1,4 +1,4 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { Vec2 } from '../math/vec2.ts';
 import type { Color } from '../math/color.ts';
 import { Drawable } from './drawable.ts';
@@ -50,7 +50,7 @@ export class Brush extends Drawable {
 	public override set pos(value: TVec2Source) {
 		this._pos.copy(value);
 		if (this.visible && this.shaderMaterial.uniforms.pos) {
-			this.shaderMaterial.uniforms.pos.value = new this.screen.three.Vector2(
+			this.shaderMaterial.uniforms.pos.value = new THREE.Vector2(
 				(this._pos.x / this.screen.w - 0.5) * 2,
 				(-this._pos.y / this.screen.h + 0.5) * 2,
 			);
@@ -66,13 +66,13 @@ export class Brush extends Drawable {
 		if (this.visible) {
 			const uniforms = this.shaderMaterial.uniforms;
 			if (uniforms.pos) {
-				uniforms.pos.value = new this.screen.three.Vector2(this._pos.x, this._pos.y);
+				uniforms.pos.value = new THREE.Vector2(this._pos.x, this._pos.y);
 			}
 			if (uniforms.size) {
 				uniforms.size.value = this._size / this.screen.h;
 			}
 			if (uniforms.color) {
-				uniforms.color.value = new this.screen.three.Vector3(
+				uniforms.color.value = new THREE.Vector3(
 					this._color.r,
 					this._color.g,
 					this._color.b,
@@ -87,7 +87,7 @@ export class Brush extends Drawable {
 	public override set color(value: Color) {
 		this._color = value;
 		if (this.visible && this.shaderMaterial.uniforms.color) {
-			this.shaderMaterial.uniforms.color.value = new this.screen.three.Vector3(
+			this.shaderMaterial.uniforms.color.value = new THREE.Vector3(
 				this._color.r,
 				this._color.g,
 				this._color.b,
@@ -96,26 +96,26 @@ export class Brush extends Drawable {
 	}
 
 	public override _geo(): THREE.BufferGeometry {
-		const geo = new this.screen.three.PlaneGeometry(2, 2);
+		const geo = new THREE.PlaneGeometry(2, 2);
 		geo.computeBoundingSphere = () => {
-			geo.boundingSphere = new this.screen.three.Sphere(undefined, Infinity);
+			geo.boundingSphere = new THREE.Sphere(undefined, Infinity);
 		};
 		geo.computeBoundingSphere();
 		geo.computeBoundingBox = () => {
-			geo.boundingBox = new this.screen.three.Box3();
+			geo.boundingBox = new THREE.Box3();
 		};
 		geo.computeBoundingBox();
 		return geo;
 	}
 
 	public override _mat(): TMaterialWithCoreProps {
-		return new this.screen.three.ShaderMaterial({
-			side: this.screen.three.DoubleSide,
+		return new THREE.ShaderMaterial({
+			side: THREE.DoubleSide,
 			uniforms: {
 				aspect: { value: this.screen.w / this.screen.h },
 				size: { value: 100 / this.screen.h },
-				pos: { value: new this.screen.three.Vector2(0, 0) },
-				color: { value: new this.screen.three.Vector3(0, 1, 1) },
+				pos: { value: new THREE.Vector2(0, 0) },
+				color: { value: new THREE.Vector3(0, 1, 1) },
 			},
 			vertexShader: `
 				varying vec3 projPos;
@@ -143,14 +143,14 @@ export class Brush extends Drawable {
 					gl_FragColor = vec4(color, opacity);
 				}
 			`,
-			blending: this.screen.three.AdditiveBlending,
+			blending: THREE.AdditiveBlending,
 			depthTest: false,
 			transparent: true,
 		});
 	}
 
 	public override _build(_opts: TBrushOpts): TDrawableMesh {
-		return new this.screen.three.Mesh(this._geo(), this._mat());
+		return new THREE.Mesh(this._geo(), this._mat());
 	}
 
 	private get shaderMaterial(): THREE.ShaderMaterial {

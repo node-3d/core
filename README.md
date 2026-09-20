@@ -38,9 +38,9 @@ Options are mostly `BrowserDocument` window options, plus:
 - `isWebGL2` - expose the context as WebGL2 to browser-style libraries.
 - `isVisible` - pass `false` to create an initially hidden window.
 
-### `addThreeHelpers(three): void`
+### `addThreeHelpers(): void`
 
-Patches a Three.js module instance for Node3D:
+Patches the application's installed Three.js peer module for Node3D:
 
 - Makes `three.FileLoader.load()` read files through Node.js.
 - Adds `three.Texture.fromId(id)` so Three.js textures can wrap existing GL texture IDs.
@@ -170,8 +170,8 @@ const { loop } = init({
 	autoFullscreen: true,
 	title: 'Crate',
 });
-addThreeHelpers(THREE);
-const screen = new Screen({ three: THREE, fov: 70, z: 2 });
+addThreeHelpers();
+const screen = new Screen({ fov: 70, z: 2 });
 
 const texture = new THREE.TextureLoader().load(
 	fileURLToPath(new URL('../three/textures/crate.gif', import.meta.url)),

@@ -102,7 +102,7 @@ const { doc, loop } = init({
 	mode: 'borderless',
 	title: 'Pacing Stress',
 });
-addThreeHelpers(THREE);
+addThreeHelpers();
 
 const monitorRate = doc.getCurrentMonitor()?.rate ?? 60;
 const targetMs = 1000 / monitorRate;
@@ -120,7 +120,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x20242b);
 
 const camera = new THREE.PerspectiveCamera(60, doc.w / doc.h, 0.1, 2000);
-const screen = new Screen({ THREE, camera, scene });
+const screen = new Screen({ camera, scene });
 
 scene.add(new THREE.AmbientLight(0x909090, 1.5));
 

@@ -11,7 +11,7 @@ const { loop } = init({
 	title: 'Mesh',
 });
 
-const screen = new Screen({ three });
+const screen = new Screen();
 
 const icon = new Image();
 icon.src = 'crate.jpg';

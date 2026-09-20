@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import * as three from 'three';
 import inited, {
 	Brush,
 	BrowserDocument,
@@ -60,14 +59,14 @@ const staticClasses: TStaticClasses = {
 
 			return new Cloud({ screen, count: 10, attrs: { position: { vbo: pos, items: 3 } } });
 		},
-		props: ['three', 'screen', 'mat', 'geo', 'mesh', 'visible'],
+		props: ['screen', 'mat', 'geo', 'mesh', 'visible'],
 		methods: [],
 	},
 	Drawable: {
 		create({ screen }) {
 			return new Drawable({ screen });
 		},
-		props: ['three', 'screen', 'mat', 'geo', 'mesh', 'z', 'visible', 'pos', 'color'],
+		props: ['screen', 'mat', 'geo', 'mesh', 'z', 'visible', 'pos', 'color'],
 		methods: [],
 	},
 	Points: {
@@ -82,7 +81,7 @@ const staticClasses: TStaticClasses = {
 
 			return new Points({ screen, count: 10, attrs: { position: { vbo: pos, items: 3 } } });
 		},
-		props: ['three', 'screen', 'mat', 'geo', 'mesh', 'visible'],
+		props: ['screen', 'mat', 'geo', 'mesh', 'visible'],
 		methods: [],
 	},
 	Lines: {
@@ -97,7 +96,7 @@ const staticClasses: TStaticClasses = {
 
 			return new Lines({ screen, count: 10, attrs: { position: { vbo: pos, items: 3 } } });
 		},
-		props: ['three', 'screen', 'mat', 'geo', 'mesh', 'visible'],
+		props: ['screen', 'mat', 'geo', 'mesh', 'visible'],
 		methods: [],
 	},
 	Tris: {
@@ -112,22 +111,21 @@ const staticClasses: TStaticClasses = {
 
 			return new Tris({ screen, count: 10, attrs: { position: { vbo: pos, items: 3 } } });
 		},
-		props: ['three', 'screen', 'mat', 'geo', 'mesh', 'visible'],
+		props: ['screen', 'mat', 'geo', 'mesh', 'visible'],
 		methods: [],
 	},
 	Rect: {
 		create({ screen }) {
 			return new Rect({ screen });
 		},
-		props: ['three', 'screen', 'mat', 'geo', 'mesh', 'visible'],
+		props: ['screen', 'mat', 'geo', 'mesh', 'visible'],
 		methods: [],
 	},
 	Screen: {
 		create() {
-			return new Screen({ three });
+			return new Screen();
 		},
 		props: [
-			'three',
 			'canvas',
 			'camera',
 			'scene',
@@ -267,7 +265,11 @@ describe('Node3D Core', () => {
 	});
 
 	describe('Static classes', () => {
-		const screen = new Screen({ three });
+		const screen = new Screen();
+
+		it('does not expose a Three.js module instance', () => {
+			assert.equal('three' in screen, false);
+		});
 
 		for (const [k, current] of Object.entries(staticClasses)) {
 			describe(k, () => {

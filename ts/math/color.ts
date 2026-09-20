@@ -227,5 +227,3 @@ export class Color extends Vec4 {
 		return (r > 15 ? '' : '0') + this.hexA.toString(16);
 	}
 }
-
-export default Color;

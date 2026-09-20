@@ -1,4 +1,5 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
+import { webgl } from '@node-3d/webgl';
 import { Color } from '../math/color.ts';
 import { Drawable } from './drawable.ts';
 import type { TDrawableMesh, TDrawableOpts, TMaterialWithCoreProps } from './drawable.ts';
@@ -48,17 +49,11 @@ export class Cloud extends Drawable {
 	}
 
 	public buildAttr(source: TCloudAttribute, count: number): THREE.GLBufferAttribute {
-		return new this.screen.three.GLBufferAttribute(
-			source.vbo,
-			this.screen.context.FLOAT,
-			source.items,
-			4,
-			count,
-		);
+		return new THREE.GLBufferAttribute(source.vbo, webgl.FLOAT, source.items, 4, count);
 	}
 
 	public override _geo(opts: TCloudOpts): THREE.BufferGeometry {
-		const geo = new this.screen.three.BufferGeometry();
+		const geo = new THREE.BufferGeometry();
 
 		for (const key of Object.keys(opts.attrs)) {
 			const attr = opts.attrs[key];
@@ -69,10 +64,7 @@ export class Cloud extends Drawable {
 				);
 			}
 		}
-		geo.boundingSphere = new this.screen.three.Sphere(
-			new this.screen.three.Vector3(),
-			Infinity,
-		);
+		geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Infinity);
 
 		return geo;
 	}
@@ -87,8 +79,8 @@ export class Cloud extends Drawable {
 			uniforms.winh.value = height;
 		});
 
-		return new this.screen.three.ShaderMaterial({
-			blending: this.screen.three.NormalBlending,
+		return new THREE.ShaderMaterial({
+			blending: THREE.NormalBlending,
 			depthTest: opts.depthTest === true,
 			transparent: true,
 			uniforms,
@@ -99,7 +91,7 @@ export class Cloud extends Drawable {
 
 	public buildVert(opts: TCloudOpts): string {
 		return (
-        opts.vert ??
+			opts.vert ??
 			`
 			attribute vec3  color;
 			varying   vec3  varColor;
@@ -123,7 +115,7 @@ export class Cloud extends Drawable {
 
 	public buildFrag(opts: TCloudOpts): string {
 		return (
-        opts.frag ??
+			opts.frag ??
 			`
 			varying vec3  varColor;
 
@@ -144,10 +136,10 @@ export class Cloud extends Drawable {
 	}
 
 	public override _build(opts: TCloudOpts): TDrawableMesh {
-		const points = new this.screen.three.Points(this._geo(opts), this._mat(opts));
+		const points = new THREE.Points(this._geo(opts), this._mat(opts));
 		points.frustumCulled = false;
 		(points as THREE.Points & { boundingSphere?: THREE.Sphere }).boundingSphere =
-			new this.screen.three.Sphere(new this.screen.three.Vector3(), Infinity);
+			new THREE.Sphere(new THREE.Vector3(), Infinity);
 		return points;
 	}
 }

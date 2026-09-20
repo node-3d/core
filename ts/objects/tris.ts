@@ -1,4 +1,4 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { Cloud } from './cloud.ts';
 import type { TCloudOpts } from './cloud.ts';
 import type { TDrawableMesh } from './drawable.ts';
@@ -6,7 +6,7 @@ import type { TDrawableMesh } from './drawable.ts';
 export class Tris extends Cloud {
 	public override buildFrag(opts: TCloudOpts): string {
 		return (
-        opts.frag ??
+			opts.frag ??
 			`
 			varying vec3  varColor;
 			varying vec2  varTcoord;
@@ -28,10 +28,12 @@ export class Tris extends Cloud {
 	}
 
 	public override _build(opts: TCloudOpts): TDrawableMesh {
-		const tris = new this.screen.three.Mesh(this._geo(opts), this._mat(opts));
+		const tris = new THREE.Mesh(this._geo(opts), this._mat(opts));
 		tris.frustumCulled = false;
-		(tris as THREE.Mesh & { boundingSphere?: THREE.Sphere }).boundingSphere =
-			new this.screen.three.Sphere(new this.screen.three.Vector3(), Infinity);
+		(tris as THREE.Mesh & { boundingSphere?: THREE.Sphere }).boundingSphere = new THREE.Sphere(
+			new THREE.Vector3(),
+			Infinity,
+		);
 		return tris;
 	}
 }

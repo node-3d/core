@@ -1,4 +1,4 @@
-import * as three from 'three';
+import type * as three from 'three';
 
 import { Points, Rect, Screen, Surface, gl, init } from '@node-3d/core';
 import type { TMouseEvent } from '@node-3d/glfw';
@@ -14,7 +14,7 @@ const { loop } = init({
 
 const VBO_SIZE = 10_000;
 
-const screen = new Screen({ three });
+const screen = new Screen();
 loop(() => screen.draw());
 
 screen.camera.position.z = 400;

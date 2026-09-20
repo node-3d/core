@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { init, addThreeHelpers, gl, Screen } from '@node-3d/core';
 import type { TCore3D, TWebgl } from '@node-3d/core';
 import { debugShaders } from '../../utils/debug-shaders.ts';
@@ -19,9 +18,9 @@ export const initCommon = (isPerf: boolean, title: string): TInitResult => {
 		title,
 		vsync: !isPerf,
 	});
-	addThreeHelpers(THREE);
+	addThreeHelpers();
 
-	const screen = new Screen({ three: THREE, fov: 75, near: 1, far: 2000 });
+	const screen = new Screen({ fov: 75, near: 1, far: 2000 });
 	screen.camera.position.z = 350;
 
 	debugShaders(screen.renderer, true);

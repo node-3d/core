@@ -1,4 +1,4 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { Cloud } from './cloud.ts';
 import type { TCloudOpts } from './cloud.ts';
 import type { TDrawableMesh } from './drawable.ts';
@@ -6,7 +6,7 @@ import type { TDrawableMesh } from './drawable.ts';
 export class Lines extends Cloud {
 	public override buildFrag(opts: TCloudOpts): string {
 		return (
-        opts.frag ??
+			opts.frag ??
 			`
 			varying vec3  varColor;
 			varying vec2  varTcoord;
@@ -31,21 +31,23 @@ export class Lines extends Cloud {
 		const Ctor = (() => {
 			const optsMode = opts.mode;
 			if (!optsMode) {
-				return this.screen.three.Line;
+				return THREE.Line;
 			}
 			switch (optsMode) {
 				case 'segments':
-					return this.screen.three.LineSegments;
+					return THREE.LineSegments;
 				case 'loop':
-					return this.screen.three.LineLoop;
+					return THREE.LineLoop;
 				default:
-					return this.screen.three.Line;
+					return THREE.Line;
 			}
 		})();
 		const lines = new Ctor(this._geo(opts), this._mat(opts));
 		lines.frustumCulled = false;
-		(lines as THREE.Line & { boundingSphere?: THREE.Sphere }).boundingSphere =
-			new this.screen.three.Sphere(new this.screen.three.Vector3(), Infinity);
+		(lines as THREE.Line & { boundingSphere?: THREE.Sphere }).boundingSphere = new THREE.Sphere(
+			new THREE.Vector3(),
+			Infinity,
+		);
 		return lines;
 	}
 }

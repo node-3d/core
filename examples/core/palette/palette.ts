@@ -28,7 +28,7 @@ const { doc, loop } = init({
 	title: 'Palette Swap',
 	vsync: !IS_PERF_MODE,
 });
-addThreeHelpers(THREE);
+addThreeHelpers();
 
 const icon = new Image(fileURLToPath(new URL('textures/icon.png', import.meta.url)));
 icon.on('load', () => {
@@ -37,7 +37,7 @@ icon.on('load', () => {
 	}
 });
 
-const screen = new Screen({ three: THREE, fov: 50, near: 1, far: 1000 });
+const screen = new Screen({ fov: 50, near: 1, far: 1000 });
 screen.renderer.shadowMap.enabled = true;
 screen.camera.position.z = 9;
 

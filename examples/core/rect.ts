@@ -1,4 +1,4 @@
-import * as three from 'three';
+import type * as three from 'three';
 
 import { Rect, Screen, init } from '@node-3d/core';
 import type { TMouseEvent } from '@node-3d/glfw';
@@ -12,7 +12,7 @@ const { loop } = init({
 	title: 'Rect',
 });
 
-const screen = new Screen({ three });
+const screen = new Screen();
 loop(() => screen.draw());
 
 screen.camera.position.z = 500;

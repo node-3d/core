@@ -1,5 +1,4 @@
 import { platform } from 'node:process';
-import * as three from 'three';
 import type { TGlfw, TInitOpts } from '../ts/types.ts';
 
 const shouldUseHeadlessGlfw = platform === 'darwin';
@@ -88,7 +87,7 @@ const getInitOpts = (): TInitOpts => {
 };
 
 const inited = init(getInitOpts());
-addThreeHelpers(three);
+addThreeHelpers();
 
 const { doc } = inited;
 const window = doc;

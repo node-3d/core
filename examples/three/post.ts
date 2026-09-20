@@ -35,7 +35,7 @@ const { doc, loop } = init({
 	title: 'Postprocessing',
 });
 const window = doc;
-addThreeHelpers(THREE);
+addThreeHelpers();
 
 const icon = new Image();
 icon.src = 'textures/three.png';

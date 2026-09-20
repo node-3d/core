@@ -414,5 +414,3 @@ export class Vec2 extends Array<number> {
 		return s >= 0 && s <= 1 && t >= 0 && t <= 1 ? t : -1;
 	}
 }
-
-export default Vec2;

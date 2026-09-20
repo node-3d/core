@@ -1,7 +1,7 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { Vec2 } from '../math/vec2.ts';
 import { Color } from '../math/color.ts';
-import type { TColorSource, TThree, TVec2Source } from '../types.ts';
+import type { TColorSource, TVec2Source } from '../types.ts';
 import type { Screen } from './screen.ts';
 
 export type TDrawableOpts = {
@@ -27,7 +27,6 @@ export type TDrawableMesh = THREE.Object3D & {
 
 export class Drawable {
 	protected _screen: Screen;
-	protected _three: TThree;
 	protected _pos: Vec2;
 	protected _z: number;
 	protected _visible: boolean;
@@ -36,7 +35,6 @@ export class Drawable {
 
 	public constructor(opts: TDrawableOpts) {
 		this._screen = opts.screen;
-		this._three = this._screen.three;
 
 		this._color = new Color(0xffffff);
 		this._pos = new Vec2(opts.pos ?? [0, 0]);
@@ -49,10 +47,6 @@ export class Drawable {
 		this.color = Drawable.makeColor(opts.color);
 		this.pos = this._pos;
 		this.z = opts.z ?? 0;
-	}
-
-	public get three(): TThree {
-		return this._three;
 	}
 
 	public get screen(): Screen {
@@ -112,11 +106,11 @@ export class Drawable {
 	}
 
 	public _build(opts: TDrawableOpts): TDrawableMesh {
-		return new this.screen.three.Mesh(this._geo(opts), this._mat(opts));
+		return new THREE.Mesh(this._geo(opts), this._mat(opts));
 	}
 
 	public _geo(_opts?: TDrawableOpts): THREE.BufferGeometry {
-		return new this.screen.three.PlaneGeometry(2, 2);
+		return new THREE.PlaneGeometry(2, 2);
 	}
 
 	public updateGeo(): void {
@@ -126,9 +120,9 @@ export class Drawable {
 	}
 
 	public _mat(_opts?: TDrawableOpts): TMaterialWithCoreProps {
-		return new this.screen.three.MeshBasicMaterial({
+		return new THREE.MeshBasicMaterial({
 			transparent: true,
-			side: this.screen.three.DoubleSide,
+			side: THREE.DoubleSide,
 			depthWrite: true,
 			depthTest: true,
 		});

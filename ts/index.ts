@@ -22,13 +22,22 @@ export { Image } from '@node-3d/image';
 export { BrowserDocument, BrowserDocument as Document } from './core/browser-document.ts';
 export { BrowserWindow, BrowserWindow as Window } from './core/browser-window.ts';
 
-export * from './math/index.ts';
-export * from './objects/index.ts';
+export { Color, Vec2, Vec3, Vec4 } from './math/index.ts';
+export {
+	Screen,
+	Drawable,
+	Cloud,
+	Points,
+	Lines,
+	Tris,
+	Rect,
+	Brush,
+	Surface,
+} from './objects/index.ts';
 
 export const glfw: TGlfw = glfwNative;
 export const gl = webgl;
 
-// oxlint-disable-next-line max-lines-per-function
 const initCore = (_opts: TInitOpts = {}): TCore3D => {
 	const opts = {
 		mode: 'windowed' as const,
@@ -40,7 +49,7 @@ const initCore = (_opts: TInitOpts = {}): TCore3D => {
 
 	const imagePrototype = Image.prototype as TImageConstructor['prototype'];
 	imagePrototype.fillRect ??= () => {
-			/* nop */
+		/* nop */
 	};
 
 	if (isWebGL2) {

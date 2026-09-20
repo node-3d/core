@@ -1,5 +1,6 @@
 import EventEmitter from 'node:events';
-import type * as THREE from 'three';
+import * as THREE from 'three';
+import { webgl } from '@node-3d/webgl';
 import { Rect } from './rect.ts';
 import type { TRectOpts } from './rect.ts';
 import { Vec2 } from '../math/vec2.ts';
@@ -38,7 +39,7 @@ export class Surface extends Rect {
 		if (opts.camera) {
 			this._camera = opts.camera;
 		} else {
-			this._camera = new this.screen.three.PerspectiveCamera(
+			this._camera = new THREE.PerspectiveCamera(
 				DEFAULT_FOV,
 				this.width / this.height,
 				DEFAULT_NEAR,
@@ -47,12 +48,12 @@ export class Surface extends Rect {
 			this._camera.position.z = 10;
 		}
 
-		this._scene = opts.scene ?? new this.screen.three.Scene();
+		this._scene = opts.scene ?? new THREE.Scene();
 		this._target = this._newTarget();
 		this.draw();
 
-		this.mesh.material = new this.screen.three.ShaderMaterial({
-			side: this.screen.three.DoubleSide,
+		this.mesh.material = new THREE.ShaderMaterial({
+			side: THREE.DoubleSide,
 			uniforms: { t: { value: this._target.texture } },
 			vertexShader: `
 				varying vec2 tc;
@@ -78,12 +79,12 @@ export class Surface extends Rect {
 		};
 
 		this.mesh.geometry.computeBoundingSphere = () => {
-			this.mesh.geometry.boundingSphere = new this.screen.three.Sphere(undefined, Infinity);
+			this.mesh.geometry.boundingSphere = new THREE.Sphere(undefined, Infinity);
 		};
 		this.mesh.geometry.computeBoundingSphere();
 
 		this.mesh.geometry.computeBoundingBox = () => {
-			this.mesh.geometry.boundingBox = new this.screen.three.Box3();
+			this.mesh.geometry.boundingBox = new THREE.Box3();
 		};
 		this.mesh.geometry.computeBoundingBox();
 
@@ -111,7 +112,7 @@ export class Surface extends Rect {
 		return this.screen.renderer;
 	}
 	public get context(): TWebgl {
-		return this.screen.context;
+		return webgl;
 	}
 	public get document(): TDocument {
 		return this.screen.document;
@@ -161,10 +162,10 @@ export class Surface extends Rect {
 	}
 
 	public _newTarget(): THREE.WebGLRenderTarget {
-		return new this.screen.three.WebGLRenderTarget(this.w * 2, this.h * 2, {
-			minFilter: this.screen.three.LinearFilter,
-			magFilter: this.screen.three.NearestFilter,
-			format: this.screen.three.RGBAFormat,
+		return new THREE.WebGLRenderTarget(this.w * 2, this.h * 2, {
+			minFilter: THREE.LinearFilter,
+			magFilter: THREE.NearestFilter,
+			format: THREE.RGBAFormat,
 		});
 	}
 

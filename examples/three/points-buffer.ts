@@ -15,7 +15,7 @@ const { loop, doc } = init({
 
 const camera = new three.PerspectiveCamera(75, doc.width / doc.height, 1, 3000);
 const scene = new three.Scene();
-const screen = new Screen({ three, camera, scene });
+const screen = new Screen({ camera, scene });
 type TDocumentEventCallback = Parameters<typeof screen.document.addEventListener>[1];
 
 const REAL_SIZE = 20_000;

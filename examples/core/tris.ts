@@ -1,5 +1,3 @@
-import * as three from 'three';
-
 import { Screen, Tris, gl, init } from '@node-3d/core';
 import type { TMouseEvent } from '@node-3d/glfw';
 
@@ -12,7 +10,7 @@ const { loop } = init({
 	title: 'Tris',
 });
 
-export const screen = new Screen({ three });
+export const screen = new Screen();
 loop(() => screen.draw());
 
 screen.camera.position.z = 70;

@@ -1,4 +1,5 @@
 import type { TMouseMoveEvent } from '@node-3d/glfw';
+import * as THREE from 'three';
 import * as node3d from '@node-3d/core';
 import { countFrame } from '../../utils/perf.ts';
 
@@ -15,7 +16,7 @@ export const projectMouseToZPlane = (screen: TScreen, mouse: TMouseNdc): TMouseW
 		return OFFSCREEN_MOUSE;
 	}
 
-	const point = new screen.three.Vector3(mouse[0], mouse[1], 0.5).unproject(screen.camera);
+	const point = new THREE.Vector3(mouse[0], mouse[1], 0.5).unproject(screen.camera);
 	const direction = point.sub(screen.camera.position).normalize();
 
 	if (Math.abs(direction.z) < 0.000001) {

@@ -1,15 +1,8 @@
 import EventEmitter from 'node:events';
-import type * as THREE from 'three';
-import type {
-	TDocument,
-	TIcon,
-	TImageConstructor,
-	TMutableWebgl,
-	TNode3DGlobal,
-	TResizeEvent,
-	TThree,
-	TWebgl,
-} from '../types.ts';
+import * as THREE from 'three';
+import { Image } from '@node-3d/image';
+import { webgl } from '@node-3d/webgl';
+import type { TDocument, TIcon, TMutableWebgl, TResizeEvent, TWebgl } from '../types.ts';
 
 const DEFAULT_FOV = 90;
 const DEFAULT_NEAR = 0.2;
@@ -20,12 +13,8 @@ const GL_VERTEX_PROGRAM_POINT_SIZE = 0x8642;
 const GL_COORD_REPLACE = 0x8862;
 
 export type TScreenOpts = Readonly<{
-	three?: unknown;
-	THREE?: unknown;
-	gl?: unknown;
 	doc?: unknown;
 	document?: unknown;
-	Image?: unknown;
 	title?: string;
 	camera?: unknown;
 	scene?: unknown;
@@ -48,18 +37,8 @@ type TRendererWithLegacyDebug = THREE.WebGLRenderer & {
 };
 
 type TDeepObject = Record<string, unknown>;
-type TScreenImplementations = Readonly<{
-	three: TThree;
-	gl: TWebgl;
-	doc: TDocument;
-	Image: TImageConstructor;
-}>;
-
 export class Screen extends EventEmitter {
-	private readonly _three: TThree;
-	private readonly _gl: TWebgl;
 	private readonly _doc: TDocument;
-	private readonly _Image: TImageConstructor;
 	private readonly _camera: TScreenCamera;
 	private readonly _scene: THREE.Scene;
 	private _renderer!: THREE.WebGLRenderer;
@@ -68,18 +47,14 @@ export class Screen extends EventEmitter {
 	public constructor(opts: TScreenOpts = {}) {
 		super();
 
-		const { three, gl, doc, Image } = Screen.resolveImplementations(opts);
-		this._three = three;
-		this._gl = gl;
-		this._doc = doc;
-		this._Image = Image;
+		this._doc = Screen.resolveDocument(opts);
 
 		if (opts.title) {
 			this.title = opts.title;
 		}
 
 		this._camera = this._createCamera(opts);
-		this._scene = (opts.scene as THREE.Scene | undefined) ?? new this._three.Scene();
+		this._scene = (opts.scene as THREE.Scene | undefined) ?? new THREE.Scene();
 
 		if (opts.renderer) {
 			this._autoRenderer = false;
@@ -95,10 +70,7 @@ export class Screen extends EventEmitter {
 	}
 
 	public get context(): TWebgl {
-		return this._gl;
-	}
-	public get three(): TThree {
-		return this._three;
+		return webgl;
 	}
 
 	public get renderer(): THREE.WebGLRenderer {
@@ -131,7 +103,7 @@ export class Screen extends EventEmitter {
 		return this._doc.height;
 	}
 	public get size(): THREE.Vector2 {
-		return new this._three.Vector2(this.w, this.h);
+		return new THREE.Vector2(this.w, this.h);
 	}
 
 	public get title(): string {
@@ -171,9 +143,9 @@ export class Screen extends EventEmitter {
 		const memSize = this.w * this.h * 4;
 		const storage = { data: Buffer.allocUnsafeSlow(memSize) };
 
-		this._gl.readPixels(0, 0, this.w, this.h, this._gl.RGBA, this._gl.UNSIGNED_BYTE, storage);
+		webgl.readPixels(0, 0, this.w, this.h, webgl.RGBA, webgl.UNSIGNED_BYTE, storage);
 
-		const img = this._Image.fromPixels(this.w, this.h, 32, storage.data);
+		const img = Image.fromPixels(this.w, this.h, 32, storage.data);
 		img.save(name);
 	}
 
@@ -234,8 +206,8 @@ export class Screen extends EventEmitter {
 		}
 
 		this._autoRenderer = true;
-		this._renderer = new this._three.WebGLRenderer({
-			context: this._gl as unknown as WebGLRenderingContext,
+		this._renderer = new THREE.WebGLRenderer({
+			context: webgl as unknown as WebGLRenderingContext,
 			canvas: this.canvas as unknown as HTMLCanvasElement,
 		});
 
@@ -247,25 +219,20 @@ export class Screen extends EventEmitter {
 			Screen.deepAssign(renderProps, this._renderer as unknown as TDeepObject);
 		}
 
-		const gl = this._gl as TMutableWebgl;
+		const gl = webgl as TMutableWebgl;
 		gl.enable(GL_POINT_SPRITE);
 		gl.enable(GL_VERTEX_PROGRAM_POINT_SIZE);
 		gl.enable(GL_COORD_REPLACE);
 	}
 
-	private static resolveImplementations(opts: TScreenOpts): TScreenImplementations {
-		const nodeGlobal = globalThis as unknown as TNode3DGlobal;
-		const three = ((opts.three ?? opts.THREE) as TThree | undefined) ?? nodeGlobal.THREE;
-		// oxlint-disable-next-line no-underscore-dangle
-		const gl = (opts.gl as TWebgl | undefined) ?? nodeGlobal._gl;
-		const doc = ((opts.doc ?? opts.document) as TDocument | undefined) ?? nodeGlobal.document;
-		const Image = (opts.Image as TImageConstructor | undefined) ?? nodeGlobal.Image;
-
-		if (!three || !gl || !doc || !Image) {
-			throw new Error('Screen requires three, webgl, document, and Image implementations.');
+	private static resolveDocument(opts: TScreenOpts): TDocument {
+		const doc =
+			((opts.doc ?? opts.document) as TDocument | undefined) ??
+			(globalThis.document as unknown as TDocument | undefined);
+		if (!doc) {
+			throw new Error('Screen requires a document. Call init() first or provide one.');
 		}
-
-		return { three, gl, doc, Image };
+		return doc;
 	}
 
 	private _createCamera(opts: TScreenOpts): TScreenCamera {
@@ -275,7 +242,7 @@ export class Screen extends EventEmitter {
 
 		const { fov, near, far, z } = opts;
 		if (fov === 0) {
-			const camera = new this._three.OrthographicCamera(
+			const camera = new THREE.OrthographicCamera(
 				-this.w * 0.5,
 				this.w * 0.5,
 				this.h * 0.5,
@@ -287,7 +254,7 @@ export class Screen extends EventEmitter {
 			return camera;
 		}
 
-		const camera = new this._three.PerspectiveCamera(
+		const camera = new THREE.PerspectiveCamera(
 			fov ?? DEFAULT_FOV,
 			this.w / this.h,
 			near ?? DEFAULT_NEAR,

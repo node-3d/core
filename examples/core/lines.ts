@@ -1,5 +1,3 @@
-import * as three from 'three';
-
 import { Lines, Screen, gl, init } from '@node-3d/core';
 import type { TMouseEvent } from '@node-3d/glfw';
 
@@ -14,7 +12,7 @@ const { loop } = init({
 
 const VBO_SIZE = 10;
 
-const screen = new Screen({ three });
+const screen = new Screen();
 
 loop(() => screen.draw());
 

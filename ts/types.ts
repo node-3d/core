@@ -1,4 +1,3 @@
-import type * as THREE from 'three';
 import type { TEvent, TImageData, TSizeEvent, glfw as glfwNative } from '@node-3d/glfw';
 import type { Image } from '@node-3d/image';
 import type { TWebGL } from '@node-3d/webgl';
@@ -9,7 +8,6 @@ import type { ResizeObserver } from './core/resize-observer.ts';
 import type { Vec2, Vec3, Vec4 } from './math/index.ts';
 
 export type TUnknownObject = Readonly<Record<string, unknown>>;
-export type TThree = typeof THREE;
 export type TWebgl = TWebGL;
 export type TMutableWebgl = TWebgl & {
 	canvas?: TDocument;
@@ -159,7 +157,6 @@ export type TInitOpts = TBrowserDocumentOpts &
 
 export type TNode3DGlobal = {
 	globalThis?: TNode3DGlobal;
-	THREE?: TThree;
 	_gl?: TWebgl;
 	Image?: TImageConstructor;
 	WebVRManager?: TWebVRManagerConstructor;

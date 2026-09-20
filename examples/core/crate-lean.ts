@@ -10,8 +10,8 @@ const { loop } = init({
 	autoFullscreen: true,
 	title: 'Crate',
 });
-addThreeHelpers(THREE);
-const screen = new Screen({ three: THREE, fov: 70, z: 2 });
+addThreeHelpers();
+const screen = new Screen({ fov: 70, z: 2 });
 
 const texture = new THREE.TextureLoader().load(
 	fileURLToPath(new URL('../three/textures/crate.gif', import.meta.url)),

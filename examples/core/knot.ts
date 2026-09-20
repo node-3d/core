@@ -11,14 +11,14 @@ const { doc, loop } = init({
 	title: 'Knot',
 	mode: 'windowed',
 });
-addThreeHelpers(THREE);
+addThreeHelpers();
 
 // Three.js rendering setup
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, doc.w / doc.h, 0.2, 500);
 camera.position.z = 35;
 scene.background = new THREE.Color(0x333333);
-const screen = new Screen({ THREE, camera, scene });
+const screen = new Screen({ camera, scene });
 
 // Add scene lights
 scene.add(new THREE.AmbientLight(0xc1c1c1, 0.5));

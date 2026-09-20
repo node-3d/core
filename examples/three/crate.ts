@@ -12,7 +12,7 @@ const { doc, raf: requestAnimationFrame } = init({
 });
 const window = doc;
 const document = doc;
-addThreeHelpers(three);
+addThreeHelpers();
 
 // --- classical theree js example below
 
@@ -41,7 +41,7 @@ const onWindowResize = (): undefined => {
 
 window.addEventListener('resize', onWindowResize);
 
-const screen = new Screen({ three });
+const screen = new Screen();
 
 const animate = () => {
 	const time = Date.now();
