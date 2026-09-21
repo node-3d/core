@@ -32,7 +32,7 @@ jobs:
             os: ubuntu-22.04-arm
             node_arch: arm64
           - target: darwin-x64
-            os: macos-26
+            os: macos-26-intel
             node_arch: x64
           - target: darwin-arm64
             os: macos-26
