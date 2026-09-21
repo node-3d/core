@@ -4,12 +4,12 @@ import type { TCloudOpts } from './cloud.ts';
 export class Points extends Cloud {
 	public override buildVert(opts: TCloudOpts): string {
 		return (
-        opts.vert ??
+			opts.vert ??
 			`
 			${
 				typeof opts.attrs.size === 'number' && opts.attrs.size > 0
 					? 'attribute float size'
-                : `float size = ${opts.size ?? '10.0'}`
+					: `float size = ${opts.size ?? '10.0'}`
 			};
 			attribute vec3  color;
 			varying   vec3  varColor;
@@ -40,7 +40,7 @@ export class Points extends Cloud {
 
 	public override buildFrag(opts: TCloudOpts): string {
 		return (
-        opts.frag ??
+			opts.frag ??
 			`
 			varying vec3  varColor;
 			varying vec2  varTcoord;

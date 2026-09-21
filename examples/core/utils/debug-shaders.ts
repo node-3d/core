@@ -7,11 +7,11 @@ const onShaderError: NonNullable<THREE.WebGLRenderer['debug']['onShaderError']> 
 	fs,
 ) => {
 	const parseForErrors = (shader: WebGLShader, name: string) => {
-			const errors = (gl.getShaderInfoLog(shader) ?? '').trim();
+		const errors = (gl.getShaderInfoLog(shader) ?? '').trim();
 		const prefix = `Errors in ${name}:\n\n${errors}`;
 
 		if (errors !== '') {
-				const code = (gl.getShaderSource(shader) ?? '').replaceAll('\t', '  ');
+			const code = (gl.getShaderSource(shader) ?? '').replaceAll('\t', '  ');
 			const lines = code.split('\n');
 			let linedCode = '';
 			let i = 1;
