@@ -68,6 +68,56 @@ const finishLoad = (
 	onLoad(decoder.decode(buffer));
 };
 
+const fileLoaderLoad = function fileLoaderLoad(
+	this: TFileLoaderThis,
+	url: string,
+	onLoad?: TFileLoadCallback,
+	_onProgress?: (event: ProgressEvent) => void,
+	onError?: TFileErrorCallback,
+): THREE.FileLoader {
+	if (url.startsWith('data:')) {
+		const [head, body] = url.split(',');
+		const isBase64 = head?.includes('base64');
+		const data = isBase64
+			? Buffer.from(body ?? '', 'base64')
+			: Buffer.from(decodeURIComponent(body ?? ''));
+		finishLoad(this.responseType, this.mimeType, onLoad, data);
+		return this;
+	}
+
+	if (/^https?:\/\//iu.test(url)) {
+		(async () => {
+			try {
+				const data = await download(url);
+				finishLoad(this.responseType, this.mimeType, onLoad, data);
+			} catch (error) {
+				if (typeof onError === 'function') {
+					onError(error);
+				} else {
+					logger.error(error);
+				}
+			}
+		})();
+
+		return this;
+	}
+
+	const fsUrl = this.path ? this.path + url : url;
+	fs.readFile(fsUrl, (error, data) => {
+		if (error) {
+			if (typeof onError === 'function') {
+				onError(error);
+			} else {
+				logger.error(error);
+			}
+			return;
+		}
+		finishLoad(this.responseType, this.mimeType, onLoad, data);
+	});
+
+	return this;
+};
+
 export type ThreeHelpersTargets = {
 	FileLoader: unknown;
 	Texture: unknown;
@@ -85,55 +135,7 @@ export const addThreeHelpers = (): void => {
 		) => THREE.FileLoader;
 	};
 
-	fileLoaderPrototype.load = function load(
-		this: TFileLoaderThis,
-		url: string,
-		onLoad?: TFileLoadCallback,
-		_onProgress?: (event: ProgressEvent) => void,
-		onError?: TFileErrorCallback,
-	): THREE.FileLoader {
-		if (url.startsWith('data:')) {
-			const [head, body] = url.split(',');
-			const isBase64 = head?.includes('base64');
-			const data = isBase64
-				? Buffer.from(body ?? '', 'base64')
-				: Buffer.from(decodeURIComponent(body ?? ''));
-			finishLoad(this.responseType, this.mimeType, onLoad, data);
-			return this;
-		}
-
-		if (/^https?:\/\//iu.test(url)) {
-			(async () => {
-				try {
-					const data = await download(url);
-					finishLoad(this.responseType, this.mimeType, onLoad, data);
-				} catch (error) {
-					if (typeof onError === 'function') {
-						onError(error);
-					} else {
-						logger.error(error);
-					}
-				}
-			})();
-
-			return this;
-		}
-
-		const fsUrl = this.path ? this.path + url : url;
-		fs.readFile(fsUrl, (error, data) => {
-			if (error) {
-				if (typeof onError === 'function') {
-					onError(error);
-				} else {
-					logger.error(error);
-				}
-				return;
-			}
-			finishLoad(this.responseType, this.mimeType, onLoad, data);
-		});
-
-		return this;
-	};
+	fileLoaderPrototype.load = fileLoaderLoad;
 
 	const Texture = three.Texture as TTextureConstructorWithFromId;
 	Texture.fromId = (id, renderer) => {
