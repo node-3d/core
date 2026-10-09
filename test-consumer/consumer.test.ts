@@ -31,6 +31,9 @@ const core = init({
 			return;
 		}
 		const current = currentGlfw as TGlfw;
+		if (useHeadlessGlfw) {
+			current.windowHint(current.CONTEXT_CREATION_API, current.EGL_CONTEXT_API);
+		}
 		current.windowHint(current.VISIBLE, current.FALSE);
 		current.windowHint(current.OPENGL_PROFILE, current.OPENGL_ANY_PROFILE);
 		current.windowHint(current.CONTEXT_VERSION_MAJOR, 3);
