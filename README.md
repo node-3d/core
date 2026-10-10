@@ -11,7 +11,10 @@ npm install @node-3d/core
 ```
 
 > This package uses precompiled Node.js addons. **There is no compilation** during `npm install`.
-> The addons are compiled for: Windows x64, Linux x64/ARM64, macOS ARM64.
+> The addons are compiled for: Windows x64/ARM64, Linux x64/ARM64, macOS x64/ARM64.
+> Published Linux binaries and runtime dependencies require glibc 2.34 or newer on
+> both architectures. Windows needs the Microsoft Visual C++ v14 runtime for the
+> target architecture. macOS binaries target 13.5.
 
 ![Example](examples/screenshot.png)
 
